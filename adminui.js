@@ -187,16 +187,47 @@
 
   /* ---------------- Join game as admin ---------------- */
   function joinGameAsAdmin(code) {
-    const ref = firebase.database().ref(code + "/status");
-    ref.set(0).then(() => {
+  const statusRef = firebase.database().ref(code + "/status");
+  const playersRef = firebase.database().ref(code + "/players");
+
+  console.log("Attempting to join game:", code);
+
+  // Step 1: get initial player count
+  playersRef.once("value").then(snapshot => {
+    const beforeCount = snapshot.numChildren();
+    console.log("Initial player count:", beforeCount);
+
+    // Step 2: reopen game (status = 0)
+    return statusRef.set(0).then(() => {
       console.log("Temporarily reopened game:", code);
-      // TODO: call your normal join function here, e.g. joinGame(code);
+
+      // Step 3: set up listener for player changes
+      let timeoutTriggered = false;
+
+      const watcher = playersRef.on("value", snap => {
+        if (timeoutTriggered) return; // ignore if already timed out
+        const nowCount = snap.numChildren();
+
+        // Detect new player joined
+        if (nowCount > beforeCount) {
+          console.log("New player joined! Resuming game:", code);
+          playersRef.off("value", watcher);
+          statusRef.set(1);
+        }
+      });
+
+      // Step 4: timeout after 60s
       setTimeout(() => {
-        ref.set(1);
-        console.log("Game resumed:", code);
-      }, 2000);
-    }).catch(err => console.error("Error reopening game:", err));
-  }
+        timeoutTriggered = true;
+        playersRef.off("value", watcher);
+        console.warn("No player change detected after 60s. Resuming game anyway:", code);
+        statusRef.set(1);
+      }, 60000);
+    });
+  }).catch(err => {
+    console.error("Error joining game as admin:", err);
+  });
+}
 
   /* ---------------- Auth watcher ---------------- */
   firebase.auth().onAuthStateChanged(user => {
