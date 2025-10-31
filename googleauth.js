@@ -1,9 +1,9 @@
-// googleauth.js  – for Firebase 7.22.1
-// assumes firebase.initializeApp(...) already ran in your main script
+// googleauth.js – Firebase 7.22.1
+// assumes firebase.initializeApp(...) ran already in your main script
+
 (function() {
-  /* ------------------  Small status text  ------------------ */
+  /* -------- Status text -------- */
   var statusText = document.createElement("div");
-  statusText.id = "google-login-status";
   Object.assign(statusText.style, {
     position: "fixed",
     left: "50%",
@@ -15,19 +15,23 @@
     borderRadius: "8px",
     fontFamily: "sans-serif",
     fontSize: "14px",
-    zIndex: "9999"
+    zIndex: "9999",
   });
   statusText.textContent = "Not signed in (anonymous)";
   document.body.appendChild(statusText);
 
-  /* ------------------  Google sign-in logic  ------------------ */
+  var allowedEmail = "breadedtuna@gmail.com";
+
+  /* -------- Google sign-in -------- */
   function googleLogin() {
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
+    firebase
+      .auth()
+      .signInWithPopup(provider)
       .then(function(result) {
         var user = result.user;
-        console.log("✅ Google sign-in success:", user.email);
-        statusText.textContent = "Signed in as " + user.email;
+        console.log("Google sign-in attempt:", user.email);
+        // we'll check permission after auth state update
       })
       .catch(function(error) {
         console.error("❌ Google sign-in error:", error);
@@ -35,7 +39,7 @@
       });
   }
 
-  /* ------------------  Desktop shortcut  ------------------ */
+  /* -------- Desktop keybind -------- */
   window.addEventListener("keydown", function(e) {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "g") {
       e.preventDefault();
@@ -43,7 +47,7 @@
     }
   });
 
-  /* ------------------  Mobile secret tap zone  ------------------ */
+  /* -------- Mobile tap zone -------- */
   var tapZone = document.createElement("div");
   Object.assign(tapZone.style, {
     position: "fixed",
@@ -52,7 +56,7 @@
     width: "80px",
     height: "80px",
     background: "transparent",
-    zIndex: "9999"
+    zIndex: "9999",
   });
   document.body.appendChild(tapZone);
 
@@ -67,19 +71,40 @@
       googleLogin();
       return;
     }
-    // reset counter if more than 2 s between taps
-    tapTimer = setTimeout(function() { tapCount = 0; }, 2000);
+    tapTimer = setTimeout(function() {
+      tapCount = 0;
+    }, 2000);
   });
 
-  /* ------------------  Auth state watcher  ------------------ */
+  /* -------- Auth state watcher -------- */
   firebase.auth().onAuthStateChanged(function(user) {
-    if (user && user.email) {
-      statusText.textContent = "Signed in as " + user.email;
-      console.log("Currently signed in as:", user.email);
-    } else if (user) {
-      statusText.textContent = "Signed in anonymously";
-    } else {
+    if (!user) {
       statusText.textContent = "Not signed in";
+      return;
     }
+
+    // If anonymous
+    if (!user.email) {
+      statusText.textContent = "Signed in anonymously";
+      return;
+    }
+
+    // Check ID token for admin claim
+    user.getIdTokenResult().then(function(idTokenResult) {
+      const isAdmin = !!idTokenResult.claims.admin;
+      if (user.email.toLowerCase() === allowedEmail && isAdmin) {
+        console.log("✅ Authorized admin:", user.email);
+        statusText.textContent = "Signed in as admin: " + user.email;
+        // you can reveal admin UI here
+      } else {
+        console.warn("❌ Unauthorized email or no admin claim:", user.email);
+        statusText.textContent = "Permission denied (" + user.email + ")";
+        alert("Permission denied: this Google account is not authorized.");
+        firebase.auth().signOut();
+      }
+    }).catch(function(err) {
+      console.error("Error reading token:", err);
+      statusText.textContent = "Permission check failed";
+    });
   });
 })();
