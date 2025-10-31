@@ -1,12 +1,8 @@
-// adminui.js  – Admin UI Framework + Active Game List + Player Viewer
 (function () {
   let adminButton, adminPanel;
-  let isDragging = false,
-    moved = false,
-    offsetX = 0,
-    offsetY = 0;
+  let isDragging = false, moved = false, offsetX = 0, offsetY = 0;
 
-  /* ---------- Draggable blue "A" button ---------- */
+  /* ───────────── Draggable Blue Button ───────────── */
   function createAdminButton() {
     adminButton = document.createElement("div");
     Object.assign(adminButton.style, {
@@ -68,17 +64,17 @@
   function stopDrag() {
     if (!isDragging) return;
     isDragging = false;
-    if (!moved) togglePanel(); // treat as tap
+    if (!moved) togglePanel();
   }
 
-  /* ---------- Draggable / scrollable admin panel ---------- */
+  /* ───────────── Admin Panel ───────────── */
   function createAdminPanel() {
     adminPanel = document.createElement("div");
     Object.assign(adminPanel.style, {
       position: "fixed",
       right: "80px",
       bottom: "20px",
-      width: "310px",
+      width: "340px",
       background: "rgba(0,0,0,0.85)",
       color: "#fff",
       borderRadius: "12px",
@@ -101,21 +97,18 @@
         <div id="admin-game-list" style="margin-top:10px;"></div>
       </div>
     `;
-
     document.body.appendChild(adminPanel);
-    document
-      .getElementById("refresh-games")
-      .addEventListener("click", loadActiveGames);
 
-    // make header draggable
     const header = adminPanel.querySelector("#admin-header");
     header.addEventListener("mousedown", startPanelDrag);
     header.addEventListener("touchstart", startPanelDrag, { passive: false });
+    document
+      .getElementById("refresh-games")
+      .addEventListener("click", loadActiveGames);
   }
 
-  let panelDragging = false,
-    panelOffsetX = 0,
-    panelOffsetY = 0;
+  /* ───────────── Make Panel Draggable ───────────── */
+  let panelDragging = false, panelOffsetX = 0, panelOffsetY = 0;
 
   function startPanelDrag(e) {
     panelDragging = true;
@@ -146,36 +139,24 @@
   }
 
   function togglePanel() {
-    if (!adminPanel) return;
-    adminPanel.style.display =
-      adminPanel.style.display === "none" ? "block" : "none";
+    adminPanel.style.display = adminPanel.style.display === "none" ? "block" : "none";
   }
 
-  /* ---------- Info + DB check ---------- */
-  function updateAdminUI(user, idTokenResult) {
-    if (!adminPanel) return;
-    document.getElementById("admin-email").textContent =
-      "Email: " + (user?.email || "none");
-    document.getElementById("admin-claim").textContent =
-      "Admin Claim: " + (idTokenResult?.claims?.admin ? "true" : "false");
+  /* ───────────── Admin Info + DB Test ───────────── */
+  function updateAdminUI(user, token) {
+    document.getElementById("admin-email").textContent = "Email: " + (user?.email || "none");
+    document.getElementById("admin-claim").textContent = "Admin Claim: " + (token?.claims?.admin ? "true" : "false");
 
-    firebase
-      .database()
-      .ref("/testServer")
-      .once("value")
-      .then(() => {
-        document.getElementById("admin-db").textContent =
-          "DB Status: ✅ Connected";
-      })
-      .catch(() => {
-        document.getElementById("admin-db").textContent =
-          "DB Status: ❌ Error";
-      });
+    firebase.database().ref("/testServer").once("value").then(() => {
+      document.getElementById("admin-db").textContent = "DB Status: ✅ Connected";
+    }).catch(() => {
+      document.getElementById("admin-db").textContent = "DB Status: ❌ Error";
+    });
 
     loadActiveGames();
   }
 
-  /* ---------- Load recent/active games ---------- */
+  /* ───────────── Load Games ───────────── */
   function loadActiveGames() {
     const list = document.getElementById("admin-game-list");
     list.innerHTML = "<div>Loading games…</div>";
@@ -183,30 +164,22 @@
     const rootRef = firebase.database().ref("/");
     const threeMinutesAgo = Date.now() - 3 * 60 * 1000;
 
-    rootRef
-      .once("value")
-      .then((snapshot) => {
-        const data = snapshot.val() || {};
-        const recentGames = [];
+    rootRef.once("value").then((snapshot) => {
+      const data = snapshot.val() || {};
+      const recentGames = [];
 
-        Object.keys(data).forEach((code) => {
-          const g = data[code];
-          if (!g || typeof g !== "object") return;
-          const ts = g.timestamp || 0;
-          if (ts >= threeMinutesAgo) {
-            recentGames.push({ code, status: g.status });
-          }
-        });
-
-        renderActiveGames(recentGames);
-      })
-      .catch((err) => {
-        console.error("Error loading active games:", err);
-        list.innerHTML = "<div>Error loading games.</div>";
+      Object.keys(data).forEach((code) => {
+        const g = data[code];
+        if (!g || typeof g !== "object") return;
+        const ts = g.timestamp || 0;
+        if (ts >= threeMinutesAgo) recentGames.push({ code, status: g.status });
       });
+
+      renderActiveGames(recentGames);
+    });
   }
 
-  /* ---------- Render game list ---------- */
+  /* ───────────── Render Game List ───────────── */
   function renderActiveGames(games) {
     const list = document.getElementById("admin-game-list");
     list.innerHTML = "<div style='font-weight:bold;margin-bottom:4px;'>Active / Recent Games</div>";
@@ -218,112 +191,156 @@
 
     games.forEach((g) => {
       const wrap = document.createElement("div");
-      Object.assign(wrap.style, {
-        marginBottom: "4px",
-        borderBottom: "1px solid rgba(255,255,255,0.15)",
-        paddingBottom: "3px",
-      });
+      wrap.style.marginBottom = "6px";
+      wrap.style.borderBottom = "1px solid rgba(255,255,255,0.15)";
+      wrap.style.paddingBottom = "3px";
 
-      const btn = document.createElement("button");
-      btn.textContent = `${g.code} (status: ${g.status})`;
-      Object.assign(btn.style, {
-        display: "block",
-        width: "100%",
-        margin: "3px 0",
-        cursor: "pointer",
-      });
-      btn.onclick = () => toggleGamePlayers(g.code, wrap);
-      wrap.appendChild(btn);
+      const row = document.createElement("div");
+      row.innerHTML = `
+        <b>${g.code}</b> (status: ${g.status})
+        <button style="margin-left:8px;">👁️ Players</button>
+        <button style="margin-left:4px;">🚪 Join</button>
+      `;
+      const [viewBtn, joinBtn] = row.querySelectorAll("button");
+      viewBtn.onclick = () => toggleGamePlayers(g.code, wrap);
+      joinBtn.onclick = () => joinGameAsAdmin(g.code);
+      wrap.appendChild(row);
 
       list.appendChild(wrap);
     });
   }
 
-  /* ---------- Toggle game -> show players ---------- */
+  /* ───────────── Toggle Game Players ───────────── */
+  const livePlayerListeners = {};
+
   function toggleGamePlayers(code, container) {
-    // remove old list if already open
     const old = container.querySelector(".player-list");
     if (old) {
       old.remove();
+      if (livePlayerListeners[code]) {
+        livePlayerListeners[code].off();
+        delete livePlayerListeners[code];
+      }
       return;
     }
 
-    const playersRef = firebase.database().ref(code + "/players");
     const sub = document.createElement("div");
     sub.className = "player-list";
     sub.style.marginLeft = "8px";
+    sub.style.borderLeft = "2px solid rgba(255,255,255,0.2)";
+    sub.style.paddingLeft = "6px";
     sub.textContent = "Loading players…";
     container.appendChild(sub);
 
-    playersRef.once("value").then((snap) => {
-      const players = snap.val() || {};
+    const playersRef = firebase.database().ref(code + "/players");
+
+    const renderPlayers = (snapshot) => {
+      const players = snapshot.val() || {};
       sub.innerHTML = `<div style="font-weight:bold;margin:4px 0;">Players in ${code}</div>`;
 
       if (Object.keys(players).length === 0) {
         sub.innerHTML += "<div>No players currently.</div>";
-      } else {
-        Object.entries(players).forEach(([id, p]) => {
-          const colorBox = `<span style="display:inline-block;width:12px;height:12px;background:${p.color || "#ccc"};margin-right:6px;border-radius:3px;"></span>`;
-          const div = document.createElement("div");
-          div.style.margin = "2px 0";
-          div.innerHTML = `${colorBox}${p.name || "(no name)"} — Lap ${p.lap ?? "?"} — Checkpoint ${p.checkpoint ?? "?"}`;
-          sub.appendChild(div);
-        });
+        return;
       }
-    });
+
+      Object.entries(players).forEach(([id, p]) => {
+        const div = document.createElement("div");
+        div.style.margin = "3px 0";
+        const color = Array.isArray(p.color) ? `rgb(${p.color.join(",")})` : "#ccc";
+
+        div.innerHTML = `
+          <div>ID: ${id}</div>
+          <div>Name: <input type="text" value="${p.name || ""}" data-field="name" data-id="${id}" style="width:120px;"></div>
+          <div>Lap: <input type="number" value="${p.lap || 0}" data-field="lap" data-id="${id}" style="width:60px;"></div>
+          <div>Checkpoint: <input type="number" value="${p.checkpoint || 0}" data-field="checkpoint" data-id="${id}" style="width:60px;"></div>
+          <div>Color: <input type="color" value="${rgbToHex(p.color)}" data-field="color" data-id="${id}"></div>
+          <hr style="border:none;border-bottom:1px solid rgba(255,255,255,0.2);margin:4px 0;">
+        `;
+        sub.appendChild(div);
+      });
+
+      // Handle edit events
+      sub.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("input", (e) => handleEdit(e, code));
+      });
+    };
+
+    playersRef.on("value", renderPlayers);
+    livePlayerListeners[code] = playersRef;
   }
 
-  /* ---------- Join game as admin ---------- */
+  function handleEdit(e, code) {
+    const field = e.target.dataset.field;
+    const id = e.target.dataset.id;
+    const val = e.target.value;
+
+    const ref = firebase.database().ref(`${code}/players/${id}/${field}`);
+
+    if (field === "color") {
+      const rgb = hexToRgbArray(val);
+      ref.set(rgb);
+    } else if (field === "lap" || field === "checkpoint") {
+      ref.set(Number(val));
+    } else {
+      ref.set(val);
+    }
+  }
+
+  /* ───────────── Color Helpers ───────────── */
+  function rgbToHex(arr) {
+    if (!Array.isArray(arr)) return "#cccccc";
+    return (
+      "#" +
+      arr
+        .map((v) => {
+          const hex = parseInt(v).toString(16).padStart(2, "0");
+          return hex;
+        })
+        .join("")
+    );
+  }
+
+  function hexToRgbArray(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  }
+
+  /* ───────────── Join Game Logic ───────────── */
   function joinGameAsAdmin(code) {
     const statusRef = firebase.database().ref(code + "/status");
     const playersRef = firebase.database().ref(code + "/players");
 
     playersRef.once("value").then((snapshot) => {
       const beforeCount = snapshot.numChildren();
-      console.log("Joining game:", code, "| current players:", beforeCount);
+      statusRef.set(0);
 
-      return statusRef.set(0).then(() => {
-        let timeoutTriggered = false;
+      let timeoutTriggered = false;
 
-        const watcher = playersRef.on("value", (snap) => {
-          if (timeoutTriggered) return;
-          const nowCount = snap.numChildren();
-          if (nowCount > beforeCount) {
-            console.log("New player joined! Resuming game:", code);
-            playersRef.off("value", watcher);
-            statusRef.set(1);
-          }
-        });
-
-        setTimeout(() => {
-          timeoutTriggered = true;
+      const watcher = playersRef.on("value", (snap) => {
+        if (timeoutTriggered) return;
+        const nowCount = snap.numChildren();
+        if (nowCount > beforeCount) {
           playersRef.off("value", watcher);
-          console.warn("No player change in 60s, resuming game:", code);
           statusRef.set(1);
-        }, 60000);
+        }
       });
+
+      setTimeout(() => {
+        timeoutTriggered = true;
+        playersRef.off("value", watcher);
+        statusRef.set(1);
+      }, 60000);
     });
   }
 
-  /* ---------- Auth watcher ---------- */
+  /* ───────────── Auth Watcher ───────────── */
   firebase.auth().onAuthStateChanged((user) => {
-    if (!user) {
-      if (adminButton) adminButton.remove();
-      if (adminPanel) adminPanel.remove();
-      adminButton = adminPanel = null;
-      return;
-    }
-
+    if (!user) return;
     user.getIdTokenResult().then((token) => {
       if (token.claims.admin) {
-        console.log("🛠 Admin UI activated for:", user.email);
         if (!adminButton) createAdminButton();
         if (!adminPanel) createAdminPanel();
         updateAdminUI(user, token);
-      } else {
-        if (adminButton) adminButton.remove();
-        if (adminPanel) adminPanel.remove();
-        adminButton = adminPanel = null;
       }
     });
   });
