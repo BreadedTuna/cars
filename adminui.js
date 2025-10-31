@@ -1,9 +1,9 @@
-// adminui.js  –  Base Admin UI Framework (mobile-friendly)
+// adminui.js  –  Admin UI Framework + Active Game List
 (function() {
   let adminButton, adminPanel;
   let isDragging = false, moved = false, offsetX = 0, offsetY = 0;
 
-  /* -------- create draggable button -------- */
+  /* ---------------- Draggable "A" button ---------------- */
   function createAdminButton() {
     adminButton = document.createElement("div");
     Object.assign(adminButton.style, {
@@ -25,18 +25,16 @@
       boxShadow: "0 0 8px rgba(0,0,0,0.4)",
       zIndex: "99999",
       userSelect: "none",
-      touchAction: "none" // helps on mobile
+      touchAction: "none"
     });
     adminButton.textContent = "A";
 
     // Drag start
     adminButton.addEventListener("mousedown", startDrag);
     adminButton.addEventListener("touchstart", startDrag, { passive: false });
-
     // Drag move
     window.addEventListener("mousemove", drag);
     window.addEventListener("touchmove", drag, { passive: false });
-
     // Drag end
     window.addEventListener("mouseup", stopDrag);
     window.addEventListener("touchend", stopDrag);
@@ -48,17 +46,17 @@
     isDragging = true;
     moved = false;
     const rect = adminButton.getBoundingClientRect();
-    const point = e.touches ? e.touches[0] : e;
-    offsetX = point.clientX - rect.left;
-    offsetY = point.clientY - rect.top;
+    const p = e.touches ? e.touches[0] : e;
+    offsetX = p.clientX - rect.left;
+    offsetY = p.clientY - rect.top;
     e.preventDefault();
   }
 
   function drag(e) {
     if (!isDragging) return;
-    const point = e.touches ? e.touches[0] : e;
-    const x = point.clientX - offsetX;
-    const y = point.clientY - offsetY;
+    const p = e.touches ? e.touches[0] : e;
+    const x = p.clientX - offsetX;
+    const y = p.clientY - offsetY;
     adminButton.style.left = x + "px";
     adminButton.style.top = y + "px";
     adminButton.style.right = "auto";
@@ -67,21 +65,20 @@
     e.preventDefault();
   }
 
-  function stopDrag(e) {
+  function stopDrag() {
     if (!isDragging) return;
     isDragging = false;
-    // Treat as tap if barely moved
-    if (!moved) togglePanel();
+    if (!moved) togglePanel(); // treat as tap
   }
 
-  /* -------- create expandable panel -------- */
+  /* ---------------- Expandable admin panel ---------------- */
   function createAdminPanel() {
     adminPanel = document.createElement("div");
     Object.assign(adminPanel.style, {
       position: "fixed",
       right: "80px",
       bottom: "20px",
-      width: "250px",
+      width: "270px",
       background: "rgba(0,0,0,0.85)",
       color: "#fff",
       borderRadius: "12px",
@@ -90,15 +87,18 @@
       fontSize: "13px",
       boxShadow: "0 0 10px rgba(0,0,0,0.5)",
       display: "none",
-      zIndex: "99999",
+      zIndex: "99999"
     });
     adminPanel.innerHTML = `
-      <div style="font-weight:bold; font-size:15px; margin-bottom:6px;">Admin Panel</div>
+      <div style="font-weight:bold;font-size:15px;margin-bottom:6px;">Admin Panel</div>
       <div id="admin-email">Email: (loading…)</div>
       <div id="admin-claim">Admin Claim: (checking…)</div>
       <div id="admin-db">DB Status: (unknown)</div>
+      <button id="refresh-games" style="margin-top:8px;width:100%;cursor:pointer;">🔄 Refresh Games</button>
     `;
     document.body.appendChild(adminPanel);
+
+    document.getElementById("refresh-games").onclick = loadActiveGames;
   }
 
   function togglePanel() {
@@ -107,7 +107,7 @@
       adminPanel.style.display === "none" ? "block" : "none";
   }
 
-  /* -------- update info -------- */
+  /* ---------------- Admin info + DB check ---------------- */
   function updateAdminUI(user, idTokenResult) {
     if (!adminPanel) return;
     document.getElementById("admin-email").textContent =
@@ -125,9 +125,80 @@
       .catch(() => {
         document.getElementById("admin-db").textContent = "DB Status: ❌ Error";
       });
+
+    // load games after info shown
+    loadActiveGames();
   }
 
-  /* -------- watch auth state -------- */
+  /* ---------------- Load recent / active games ---------------- */
+  function loadActiveGames() {
+    const rootRef = firebase.database().ref("/");
+    const threeMinutesAgo = Date.now() - 3 * 60 * 1000;
+
+    rootRef.once("value").then(snapshot => {
+      const data = snapshot.val() || {};
+      const recentGames = [];
+
+      Object.keys(data).forEach(code => {
+        const game = data[code];
+        if (!game || typeof game !== "object") return;
+        const status = game.status;
+        const ts = game.timestamp || 0;
+        if (ts >= threeMinutesAgo) {
+          recentGames.push({ code, status, ts });
+        }
+      });
+
+      renderActiveGames(recentGames);
+    }).catch(err => {
+      console.error("Error loading active games:", err);
+    });
+  }
+
+  /* ---------------- Render game list in panel ---------------- */
+  function renderActiveGames(games) {
+    const old = document.getElementById("admin-game-list");
+    if (old) old.remove();
+
+    const container = document.createElement("div");
+    container.id = "admin-game-list";
+    container.style.marginTop = "10px";
+    container.innerHTML = `<div style='font-weight:bold;margin-bottom:4px;'>Active / Recent Games</div>`;
+
+    if (games.length === 0) {
+      container.innerHTML += "<div>No active or recent games.</div>";
+    } else {
+      games.forEach(g => {
+        const btn = document.createElement("button");
+        btn.textContent = `${g.code}  (status: ${g.status})`;
+        Object.assign(btn.style, {
+          display: "block",
+          margin: "4px 0",
+          width: "100%",
+          cursor: "pointer"
+        });
+        btn.onclick = () => joinGameAsAdmin(g.code);
+        container.appendChild(btn);
+      });
+    }
+
+    adminPanel.appendChild(container);
+  }
+
+  /* ---------------- Join game as admin ---------------- */
+  function joinGameAsAdmin(code) {
+    const ref = firebase.database().ref(code + "/status");
+    ref.set(0).then(() => {
+      console.log("Temporarily reopened game:", code);
+      // TODO: call your normal join function here, e.g. joinGame(code);
+      setTimeout(() => {
+        ref.set(1);
+        console.log("Game resumed:", code);
+      }, 2000);
+    }).catch(err => console.error("Error reopening game:", err));
+  }
+
+  /* ---------------- Auth watcher ---------------- */
   firebase.auth().onAuthStateChanged(user => {
     if (!user) {
       if (adminButton) adminButton.remove();
