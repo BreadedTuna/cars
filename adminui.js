@@ -1,9 +1,9 @@
-// adminui.js  –  Base Admin UI Framework
+// adminui.js  –  Base Admin UI Framework (mobile-friendly)
 (function() {
   let adminButton, adminPanel;
-  let isDragging = false, offsetX = 0, offsetY = 0;
+  let isDragging = false, moved = false, offsetX = 0, offsetY = 0;
 
-  // --- create draggable button ---
+  /* -------- create draggable button -------- */
   function createAdminButton() {
     adminButton = document.createElement("div");
     Object.assign(adminButton.style, {
@@ -25,44 +25,56 @@
       boxShadow: "0 0 8px rgba(0,0,0,0.4)",
       zIndex: "99999",
       userSelect: "none",
+      touchAction: "none" // helps on mobile
     });
     adminButton.textContent = "A";
 
-    // Drag logic
+    // Drag start
     adminButton.addEventListener("mousedown", startDrag);
-    adminButton.addEventListener("touchstart", startDrag);
+    adminButton.addEventListener("touchstart", startDrag, { passive: false });
 
+    // Drag move
     window.addEventListener("mousemove", drag);
-    window.addEventListener("touchmove", drag);
+    window.addEventListener("touchmove", drag, { passive: false });
+
+    // Drag end
     window.addEventListener("mouseup", stopDrag);
     window.addEventListener("touchend", stopDrag);
-
-    adminButton.addEventListener("click", togglePanel);
 
     document.body.appendChild(adminButton);
   }
 
   function startDrag(e) {
     isDragging = true;
+    moved = false;
     const rect = adminButton.getBoundingClientRect();
-    offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    const point = e.touches ? e.touches[0] : e;
+    offsetX = point.clientX - rect.left;
+    offsetY = point.clientY - rect.top;
     e.preventDefault();
   }
 
   function drag(e) {
     if (!isDragging) return;
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - offsetX;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - offsetY;
+    const point = e.touches ? e.touches[0] : e;
+    const x = point.clientX - offsetX;
+    const y = point.clientY - offsetY;
     adminButton.style.left = x + "px";
     adminButton.style.top = y + "px";
     adminButton.style.right = "auto";
     adminButton.style.bottom = "auto";
+    moved = true;
+    e.preventDefault();
   }
 
-  function stopDrag() { isDragging = false; }
+  function stopDrag(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    // Treat as tap if barely moved
+    if (!moved) togglePanel();
+  }
 
-  // --- create expandable panel ---
+  /* -------- create expandable panel -------- */
   function createAdminPanel() {
     adminPanel = document.createElement("div");
     Object.assign(adminPanel.style, {
@@ -95,7 +107,7 @@
       adminPanel.style.display === "none" ? "block" : "none";
   }
 
-  // --- update displayed info ---
+  /* -------- update info -------- */
   function updateAdminUI(user, idTokenResult) {
     if (!adminPanel) return;
     document.getElementById("admin-email").textContent =
@@ -103,7 +115,6 @@
     document.getElementById("admin-claim").textContent =
       "Admin Claim: " + (idTokenResult?.claims?.admin ? "true" : "false");
 
-    // quick database test
     firebase
       .database()
       .ref("/testServer")
@@ -116,11 +127,12 @@
       });
   }
 
-  // --- watch auth state ---
+  /* -------- watch auth state -------- */
   firebase.auth().onAuthStateChanged(user => {
     if (!user) {
       if (adminButton) adminButton.remove();
       if (adminPanel) adminPanel.remove();
+      adminButton = adminPanel = null;
       return;
     }
 
@@ -134,6 +146,7 @@
       } else {
         if (adminButton) adminButton.remove();
         if (adminPanel) adminPanel.remove();
+        adminButton = adminPanel = null;
       }
     });
   });
