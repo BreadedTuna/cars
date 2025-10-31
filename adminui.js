@@ -1,9 +1,12 @@
-// adminui.js  –  Admin UI Framework + Active Game List
-(function() {
+// adminui.js  – Admin UI Framework + Active Game List + Player Viewer
+(function () {
   let adminButton, adminPanel;
-  let isDragging = false, moved = false, offsetX = 0, offsetY = 0;
+  let isDragging = false,
+    moved = false,
+    offsetX = 0,
+    offsetY = 0;
 
-  /* ---------------- Draggable "A" button ---------------- */
+  /* ---------- Draggable blue "A" button ---------- */
   function createAdminButton() {
     adminButton = document.createElement("div");
     Object.assign(adminButton.style, {
@@ -25,17 +28,14 @@
       boxShadow: "0 0 8px rgba(0,0,0,0.4)",
       zIndex: "99999",
       userSelect: "none",
-      touchAction: "none"
+      touchAction: "none",
     });
     adminButton.textContent = "A";
 
-    // Drag start
     adminButton.addEventListener("mousedown", startDrag);
     adminButton.addEventListener("touchstart", startDrag, { passive: false });
-    // Drag move
     window.addEventListener("mousemove", drag);
     window.addEventListener("touchmove", drag, { passive: false });
-    // Drag end
     window.addEventListener("mouseup", stopDrag);
     window.addEventListener("touchend", stopDrag);
 
@@ -71,34 +71,78 @@
     if (!moved) togglePanel(); // treat as tap
   }
 
-  /* ---------------- Expandable admin panel ---------------- */
+  /* ---------- Draggable / scrollable admin panel ---------- */
   function createAdminPanel() {
     adminPanel = document.createElement("div");
     Object.assign(adminPanel.style, {
       position: "fixed",
       right: "80px",
       bottom: "20px",
-      width: "270px",
+      width: "310px",
       background: "rgba(0,0,0,0.85)",
       color: "#fff",
       borderRadius: "12px",
-      padding: "10px 14px",
       fontFamily: "monospace",
       fontSize: "13px",
       boxShadow: "0 0 10px rgba(0,0,0,0.5)",
       display: "none",
-      zIndex: "99999"
+      zIndex: "99999",
     });
-    adminPanel.innerHTML = `
-      <div style="font-weight:bold;font-size:15px;margin-bottom:6px;">Admin Panel</div>
-      <div id="admin-email">Email: (loading…)</div>
-      <div id="admin-claim">Admin Claim: (checking…)</div>
-      <div id="admin-db">DB Status: (unknown)</div>
-      <button id="refresh-games" style="margin-top:8px;width:100%;cursor:pointer;">🔄 Refresh Games</button>
-    `;
-    document.body.appendChild(adminPanel);
 
-    document.getElementById("refresh-games").onclick = loadActiveGames;
+    adminPanel.innerHTML = `
+      <div id="admin-header" style="cursor:move;font-weight:bold;font-size:15px;padding:8px;background:rgba(255,255,255,0.1);border-radius:12px 12px 0 0;">
+        Admin Panel
+      </div>
+      <div id="admin-content" style="padding:10px 14px;max-height:70vh;overflow-y:auto;">
+        <div id="admin-email">Email: (loading…)</div>
+        <div id="admin-claim">Admin Claim: (checking…)</div>
+        <div id="admin-db">DB Status: (unknown)</div>
+        <button id="refresh-games" style="margin-top:8px;width:100%;cursor:pointer;">🔄 Refresh Games</button>
+        <div id="admin-game-list" style="margin-top:10px;"></div>
+      </div>
+    `;
+
+    document.body.appendChild(adminPanel);
+    document
+      .getElementById("refresh-games")
+      .addEventListener("click", loadActiveGames);
+
+    // make header draggable
+    const header = adminPanel.querySelector("#admin-header");
+    header.addEventListener("mousedown", startPanelDrag);
+    header.addEventListener("touchstart", startPanelDrag, { passive: false });
+  }
+
+  let panelDragging = false,
+    panelOffsetX = 0,
+    panelOffsetY = 0;
+
+  function startPanelDrag(e) {
+    panelDragging = true;
+    const rect = adminPanel.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    panelOffsetX = p.clientX - rect.left;
+    panelOffsetY = p.clientY - rect.top;
+    window.addEventListener("mousemove", dragPanel);
+    window.addEventListener("touchmove", dragPanel, { passive: false });
+    window.addEventListener("mouseup", stopPanelDrag);
+    window.addEventListener("touchend", stopPanelDrag);
+    e.preventDefault();
+  }
+
+  function dragPanel(e) {
+    if (!panelDragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const x = p.clientX - panelOffsetX;
+    const y = p.clientY - panelOffsetY;
+    Object.assign(adminPanel.style, { left: x + "px", top: y + "px", right: "auto", bottom: "auto" });
+    e.preventDefault();
+  }
+
+  function stopPanelDrag() {
+    panelDragging = false;
+    window.removeEventListener("mousemove", dragPanel);
+    window.removeEventListener("touchmove", dragPanel);
   }
 
   function togglePanel() {
@@ -107,7 +151,7 @@
       adminPanel.style.display === "none" ? "block" : "none";
   }
 
-  /* ---------------- Admin info + DB check ---------------- */
+  /* ---------- Info + DB check ---------- */
   function updateAdminUI(user, idTokenResult) {
     if (!adminPanel) return;
     document.getElementById("admin-email").textContent =
@@ -120,117 +164,149 @@
       .ref("/testServer")
       .once("value")
       .then(() => {
-        document.getElementById("admin-db").textContent = "DB Status: ✅ Connected";
+        document.getElementById("admin-db").textContent =
+          "DB Status: ✅ Connected";
       })
       .catch(() => {
-        document.getElementById("admin-db").textContent = "DB Status: ❌ Error";
+        document.getElementById("admin-db").textContent =
+          "DB Status: ❌ Error";
       });
 
-    // load games after info shown
     loadActiveGames();
   }
 
-  /* ---------------- Load recent / active games ---------------- */
+  /* ---------- Load recent/active games ---------- */
   function loadActiveGames() {
+    const list = document.getElementById("admin-game-list");
+    list.innerHTML = "<div>Loading games…</div>";
+
     const rootRef = firebase.database().ref("/");
     const threeMinutesAgo = Date.now() - 3 * 60 * 1000;
 
-    rootRef.once("value").then(snapshot => {
-      const data = snapshot.val() || {};
-      const recentGames = [];
+    rootRef
+      .once("value")
+      .then((snapshot) => {
+        const data = snapshot.val() || {};
+        const recentGames = [];
 
-      Object.keys(data).forEach(code => {
-        const game = data[code];
-        if (!game || typeof game !== "object") return;
-        const status = game.status;
-        const ts = game.timestamp || 0;
-        if (ts >= threeMinutesAgo) {
-          recentGames.push({ code, status, ts });
-        }
+        Object.keys(data).forEach((code) => {
+          const g = data[code];
+          if (!g || typeof g !== "object") return;
+          const ts = g.timestamp || 0;
+          if (ts >= threeMinutesAgo) {
+            recentGames.push({ code, status: g.status });
+          }
+        });
+
+        renderActiveGames(recentGames);
+      })
+      .catch((err) => {
+        console.error("Error loading active games:", err);
+        list.innerHTML = "<div>Error loading games.</div>";
       });
-
-      renderActiveGames(recentGames);
-    }).catch(err => {
-      console.error("Error loading active games:", err);
-    });
   }
 
-  /* ---------------- Render game list in panel ---------------- */
+  /* ---------- Render game list ---------- */
   function renderActiveGames(games) {
-    const old = document.getElementById("admin-game-list");
-    if (old) old.remove();
-
-    const container = document.createElement("div");
-    container.id = "admin-game-list";
-    container.style.marginTop = "10px";
-    container.innerHTML = `<div style='font-weight:bold;margin-bottom:4px;'>Active / Recent Games</div>`;
+    const list = document.getElementById("admin-game-list");
+    list.innerHTML = "<div style='font-weight:bold;margin-bottom:4px;'>Active / Recent Games</div>";
 
     if (games.length === 0) {
-      container.innerHTML += "<div>No active or recent games.</div>";
-    } else {
-      games.forEach(g => {
-        const btn = document.createElement("button");
-        btn.textContent = `${g.code}  (status: ${g.status})`;
-        Object.assign(btn.style, {
-          display: "block",
-          margin: "4px 0",
-          width: "100%",
-          cursor: "pointer"
-        });
-        btn.onclick = () => joinGameAsAdmin(g.code);
-        container.appendChild(btn);
-      });
+      list.innerHTML += "<div>No active or recent games.</div>";
+      return;
     }
 
-    adminPanel.appendChild(container);
-  }
-
-  /* ---------------- Join game as admin ---------------- */
-  function joinGameAsAdmin(code) {
-  const statusRef = firebase.database().ref(code + "/status");
-  const playersRef = firebase.database().ref(code + "/players");
-
-  console.log("Attempting to join game:", code);
-
-  // Step 1: get initial player count
-  playersRef.once("value").then(snapshot => {
-    const beforeCount = snapshot.numChildren();
-    console.log("Initial player count:", beforeCount);
-
-    // Step 2: reopen game (status = 0)
-    return statusRef.set(0).then(() => {
-      console.log("Temporarily reopened game:", code);
-
-      // Step 3: set up listener for player changes
-      let timeoutTriggered = false;
-
-      const watcher = playersRef.on("value", snap => {
-        if (timeoutTriggered) return; // ignore if already timed out
-        const nowCount = snap.numChildren();
-
-        // Detect new player joined
-        if (nowCount > beforeCount) {
-          console.log("New player joined! Resuming game:", code);
-          playersRef.off("value", watcher);
-          statusRef.set(1);
-        }
+    games.forEach((g) => {
+      const wrap = document.createElement("div");
+      Object.assign(wrap.style, {
+        marginBottom: "4px",
+        borderBottom: "1px solid rgba(255,255,255,0.15)",
+        paddingBottom: "3px",
       });
 
-      // Step 4: timeout after 60s
-      setTimeout(() => {
-        timeoutTriggered = true;
-        playersRef.off("value", watcher);
-        console.warn("No player change detected after 60s. Resuming game anyway:", code);
-        statusRef.set(1);
-      }, 60000);
-    });
-  }).catch(err => {
-    console.error("Error joining game as admin:", err);
-  });
-}
+      const btn = document.createElement("button");
+      btn.textContent = `${g.code} (status: ${g.status})`;
+      Object.assign(btn.style, {
+        display: "block",
+        width: "100%",
+        margin: "3px 0",
+        cursor: "pointer",
+      });
+      btn.onclick = () => toggleGamePlayers(g.code, wrap);
+      wrap.appendChild(btn);
 
-  /* ---------------- Auth watcher ---------------- */
-  firebase.auth().onAuthStateChanged(user => {
+      list.appendChild(wrap);
+    });
+  }
+
+  /* ---------- Toggle game -> show players ---------- */
+  function toggleGamePlayers(code, container) {
+    // remove old list if already open
+    const old = container.querySelector(".player-list");
+    if (old) {
+      old.remove();
+      return;
+    }
+
+    const playersRef = firebase.database().ref(code + "/players");
+    const sub = document.createElement("div");
+    sub.className = "player-list";
+    sub.style.marginLeft = "8px";
+    sub.textContent = "Loading players…";
+    container.appendChild(sub);
+
+    playersRef.once("value").then((snap) => {
+      const players = snap.val() || {};
+      sub.innerHTML = `<div style="font-weight:bold;margin:4px 0;">Players in ${code}</div>`;
+
+      if (Object.keys(players).length === 0) {
+        sub.innerHTML += "<div>No players currently.</div>";
+      } else {
+        Object.entries(players).forEach(([id, p]) => {
+          const colorBox = `<span style="display:inline-block;width:12px;height:12px;background:${p.color || "#ccc"};margin-right:6px;border-radius:3px;"></span>`;
+          const div = document.createElement("div");
+          div.style.margin = "2px 0";
+          div.innerHTML = `${colorBox}${p.name || "(no name)"} — Lap ${p.lap ?? "?"} — Checkpoint ${p.checkpoint ?? "?"}`;
+          sub.appendChild(div);
+        });
+      }
+    });
+  }
+
+  /* ---------- Join game as admin ---------- */
+  function joinGameAsAdmin(code) {
+    const statusRef = firebase.database().ref(code + "/status");
+    const playersRef = firebase.database().ref(code + "/players");
+
+    playersRef.once("value").then((snapshot) => {
+      const beforeCount = snapshot.numChildren();
+      console.log("Joining game:", code, "| current players:", beforeCount);
+
+      return statusRef.set(0).then(() => {
+        let timeoutTriggered = false;
+
+        const watcher = playersRef.on("value", (snap) => {
+          if (timeoutTriggered) return;
+          const nowCount = snap.numChildren();
+          if (nowCount > beforeCount) {
+            console.log("New player joined! Resuming game:", code);
+            playersRef.off("value", watcher);
+            statusRef.set(1);
+          }
+        });
+
+        setTimeout(() => {
+          timeoutTriggered = true;
+          playersRef.off("value", watcher);
+          console.warn("No player change in 60s, resuming game:", code);
+          statusRef.set(1);
+        }, 60000);
+      });
+    });
+  }
+
+  /* ---------- Auth watcher ---------- */
+  firebase.auth().onAuthStateChanged((user) => {
     if (!user) {
       if (adminButton) adminButton.remove();
       if (adminPanel) adminPanel.remove();
@@ -238,13 +314,12 @@
       return;
     }
 
-    user.getIdTokenResult().then(tokenResult => {
-      const isAdmin = tokenResult.claims.admin === true;
-      if (isAdmin) {
+    user.getIdTokenResult().then((token) => {
+      if (token.claims.admin) {
         console.log("🛠 Admin UI activated for:", user.email);
         if (!adminButton) createAdminButton();
         if (!adminPanel) createAdminPanel();
-        updateAdminUI(user, tokenResult);
+        updateAdminUI(user, token);
       } else {
         if (adminButton) adminButton.remove();
         if (adminPanel) adminPanel.remove();
