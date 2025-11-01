@@ -1134,3 +1134,4 @@ document.body.onkeydown = function(e){
 	if(e.keyCode == 73 && (e.ctrlKey || e.metaKey))
 		document.getElementById("trackcode").innerText = prompt("Track data?")
 }
+}
