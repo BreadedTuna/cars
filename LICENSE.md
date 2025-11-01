@@ -1,6 +1,6 @@
 # License for Online Racing Game modded
 
-Copyright © [2025] [BreadedTuna](https://github.com/BreadedTuna)  
+Copyright © 2025 [BreadedTuna](https://github.com/BreadedTuna)  
 All Rights Reserved.
 
 This project is a **modded web version** of a game originally created by [jchabin](https://github.com/jchabin).  
