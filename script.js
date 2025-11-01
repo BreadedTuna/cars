@@ -406,6 +406,31 @@ host = function(){
 				}
 				me.ref.set(me.data);
 
+				// Simple admin edit sync — checks every 100ms for updates
+setInterval(() => {
+  if (!me || !me.ref) return;
+  me.ref.once("value").then((snap) => {
+    const val = snap.val();
+    if (!val || !me.data) return;
+
+    // List of keys to sync from server
+    ["name", "color", "checkpoint", "lap"].forEach((key) => {
+      if (val[key] !== me.data[key]) {
+        me.data[key] = val[key];
+
+        // Apply updates to visuals
+        if (key === "color" && me.model) {
+          me.model.material.color = new THREE.Color(
+            "hsl(" + val.color + ", 100%, 50%)"
+          );
+        }
+        if (key === "name" && me.label) {
+          me.label.innerHTML = val.name.replaceAll("<", "&lt;") + "<br/>|";
+        }
+      }
+    });
+  });
+}, 100);
 				// --- Admin edits / external changes sync (every 100ms) ---
 // --- Sync local -> Firebase only when values change ---
 let lastSentData = null;
