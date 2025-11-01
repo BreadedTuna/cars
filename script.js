@@ -385,29 +385,44 @@ host = function(){
 					}
 				});
 				
-				database.ref(code + "/players").on("child_changed", function(p) {
+				database.ref(code + "/players").on("child_changed", function (p) {
   const id = p.ref_.path.pieces_[2];
   const pl = players[id];
   const newData = p.val();
 
   if (!pl || !newData) return;
 
-  // Update stored data
-  pl.data = newData;
+  // Merge server updates into local data
+  Object.assign(pl.data, newData);
 
-  // Update color live
+  // 🔹 Update car color live
   if (pl.model && typeof newData.color !== "undefined") {
     pl.model.material.color = new THREE.Color(
       "hsl(" + newData.color + ", 100%, 50%)"
     );
   }
 
-  // Update name label
+  // 🔹 Update name label
   if (pl.label && typeof newData.name === "string") {
     pl.label.innerHTML = newData.name.replaceAll("<", "&lt;") + "<br/>|";
   }
 
-  // Optional: if you also want lap/checkpoint UI updates, do them here.
+  // 🔹 If this client is the one being updated, reflect changes locally too
+  if (me && me.ref && me.ref.path && me.ref.path.pieces_[2] === id) {
+    if (typeof newData.color !== "undefined" && me.model) {
+      me.model.material.color = new THREE.Color(
+        "hsl(" + newData.color + ", 100%, 50%)"
+      );
+    }
+    if (typeof newData.name === "string" && me.label) {
+      me.label.innerHTML = newData.name.replaceAll("<", "&lt;") + "<br/>|";
+    }
+    ["checkpoint", "lap"].forEach((key) => {
+      if (typeof newData[key] !== "undefined") {
+        me.data[key] = newData[key];
+      }
+    });
+  }
 });
 				
 				me.ref = database.ref(code + "/players").push();
