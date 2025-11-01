@@ -407,30 +407,59 @@ host = function(){
 				me.ref.set(me.data);
 
 				// --- Admin edits / external changes sync (every 100ms) ---
-setInterval(() => {
-  if (!me || !me.ref) return;
-  me.ref.once("value").then((snap) => {
-    const val = snap.val();
-    if (!val || !me.data) return;
+// --- Sync local -> Firebase only when values change ---
+let lastSentData = null;
+let syncInterval = null;
 
-    ["name", "color", "checkpoint", "lap"].forEach((key) => {
-      if (val[key] !== me.data[key]) {
-        me.data[key] = val[key];
+function startSync() {
+  if (!me.data || !me.ref) return; // wait until setup done
+  if (syncInterval) clearInterval(syncInterval);
 
-        // Visual updates
+  lastSentData = JSON.stringify(me.data);
+  syncInterval = setInterval(() => {
+    if (!me.data || !me.ref) return;
+    const currentData = JSON.stringify(me.data);
+    if (currentData !== lastSentData) {
+      me.ref.set(me.data);
+      lastSentData = currentData;
+    }
+  }, 200);
+}
+
+// --- Listen for admin/external edits safely ---
+function startAdminListener() {
+  if (!me.ref) return;
+  me.ref.on("value", (snapshot) => {
+    const serverData = snapshot.val();
+    if (!serverData || !me.data) return;
+
+    for (let key in serverData) {
+      // skip if not in our data
+      if (!(key in me.data)) continue;
+
+      // detect external change
+      if (serverData[key] !== me.data[key]) {
+        me.data[key] = serverData[key];
+
+        // Color update
         if (key === "color" && me.model) {
           me.model.material.color = new THREE.Color(
-            "hsl(" + val.color + ", 100%, 50%)"
+            "hsl(" + serverData[key] + ", 100%, 50%)"
           );
         }
+
+        // Name update
         if (key === "name" && me.label) {
-          me.label.innerHTML = val.name.replaceAll("<", "&lt;") + "<br/>|";
+          me.label.innerHTML =
+            serverData[key].replaceAll("<", "&lt;") + "<br/>|";
         }
       }
-    });
+    }
   });
-}, 100);
-
+}
+				// start syncing and admin listening AFTER local data defined
+startSync();
+startAdminListener();
 				
 				database.ref(code + "/status").on("value", function(v){
 					v = v.val();
