@@ -430,7 +430,6 @@ setInterval(() => {
     });
   });
 }, 100);
-
 				
 				database.ref(code + "/status").on("value", function(v){
 					v = v.val();
