@@ -308,10 +308,11 @@ menu2 = function(){
 }
 
 host = function(){
+	fadeOut(menuMusic)
 	document.getElementById("host").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
 	setTimeout(function(){
-		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='fadeOut(menuMusic); startGame();' ontouchstart='this.click()'>Start!</div>";
+		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>";
 		if(VR)
 			f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
