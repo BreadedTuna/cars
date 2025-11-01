@@ -152,7 +152,7 @@
     const list = document.getElementById("admin-game-list");
     list.innerHTML = "<div>Loading games…</div>";
     const rootRef = firebase.database().ref("/");
-    const threeMinutesAgo = Date.now() - 3 * 60 * 1000;
+    const threeMinutesAgo = Date.now() - 10 * 60 * 1000;
     rootRef.once("value").then((snapshot) => {
       const data = snapshot.val() || {};
       const games = [];
