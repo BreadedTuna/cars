@@ -319,218 +319,170 @@ host = function(){
 		getCode();
 	}, 1000);
 	
-	function getCode() {
-	code = "";
-	var letters = "ABCDEFGHIJKLMMNOPQRSTUVWXYZ";
-	for (var i = 0; i < 4; i++)
-		code += letters[Math.floor(Math.random() * letters.length)];
-
-	database.ref(code).once("value", function (codeCheck) {
-		console.log(codeCheck.val());
-		if (
-			codeCheck.val() == null ||
-			codeCheck.val().status == -1 ||
-			!codeCheck.val().timestamp ||
-			Date.now() - codeCheck.val().timestamp > 1000 * 60 * 60 * 24
-		) {
-			console.log(code);
-			document.getElementById("code").innerHTML = code;
-
-			database.ref(code).set({
-				status: 0,
-				players: {},
-				map: document.getElementById("trackcode").innerHTML,
-				timestamp: Date.now(),
-			});
-
-			database.ref(code + "/players").on("child_added", function (p) {
-				console.log(p);
-				players[p.ref_.path.pieces_[2]] = {
-					data: p.val(),
-					model: new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 2)),
-				};
-				var pl = players[p.ref_.path.pieces_[2]];
-				pl.model.position.set(pl.data.x, 0.6, pl.data.y);
-				pl.model.material = new THREE.MeshLambertMaterial({
-					color: new THREE.Color("hsl(" + pl.data.color + ", 100%, 50%)"),
+	function getCode(){
+		code = "";
+		var letters = "ABCDEFGHIJKLMMNOPQRSTUVWXYZ";
+		for(var i = 0; i < 4; i++)
+			code += letters[Math.floor(Math.random() * letters.length)];
+		database.ref(code).once("value", function(codeCheck){
+			console.log(codeCheck.val());
+			if(codeCheck.val() == null || codeCheck.val().status == -1 || !codeCheck.val().timestamp || Date.now() - codeCheck.val().timestamp > 1000 * 60 * 60 * 24){ // Allow overwriting a game if it was created more than 24 hours ago - seems safe.
+				console.log(code);
+				document.getElementById("code").innerHTML = code;
+				
+				database.ref(code).set({
+					status: 0,
+					players: {},
+					map: document.getElementById("trackcode").innerHTML,
+					timestamp: Date.now()
 				});
-
-				var wheel = new THREE.Mesh(
-					new THREE.CylinderBufferGeometry(0.5, 0.5, 0.2, 10),
-					new THREE.MeshLambertMaterial({ color: new THREE.Color("#222") })
-				);
-				var w1 = wheel.clone();
-				w1.position.set(0.6, -0.1, 0.7);
-				w1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
-				pl.model.add(w1);
-				var w2 = wheel.clone();
-				w2.position.set(-0.6, -0.1, 0.7);
-				w2.rotation.set(Math.PI / 2, 0, Math.PI / 2);
-				pl.model.add(w2);
-				var w3 = wheel.clone();
-				w3.position.set(0.6, -0.1, -0.7);
-				w3.rotation.set(Math.PI / 2, 0, Math.PI / 2);
-				pl.model.add(w3);
-				var w4 = wheel.clone();
-				w4.position.set(-0.6, -0.1, -0.7);
-				w4.rotation.set(Math.PI / 2, 0, Math.PI / 2);
-				pl.model.add(w4);
-
-				var label = document.createElement("DIV");
-				label.className = "label";
-				label.innerHTML = pl.data.name.replaceAll("<", "&lt;") + "<br/>|";
-				pl.label = label;
-				label.position = pl.model.position;
-				console.log(label);
-				f.appendChild(label);
-				labels.push(label);
-				pl.model.receiveShadow = true;
-				scene.add(pl.model);
-
-				if (p.ref_.path.pieces_[2] == me.ref.path.pieces_[2]) {
-					me.label = pl.label;
-					me.model = pl.model;
-					me.label.innerHTML = "";
-				}
-			});
-
-			database.ref(code + "/players").on("child_changed", function (p) {
-				players[p.ref_.path.pieces_[2]].data = p.val();
-			});
-
-			me.ref = database.ref(code + "/players").push();
-			me.data = {
-				x: 0,
-				y: 0,
-				xv: 0,
-				yv: 0,
-				dir: 0,
-				steer: 0,
-				color: color,
-				name: name,
-				checkpoint: 1,
-				lap: 0,
-				collision: {},
-			};
-
-			// --- Admin sync logic ---
-			let lastSentData = null;
-			let syncInterval = null;
-
-			function startSync() {
-				if (!me.data || !me.ref) return;
-				if (syncInterval) clearInterval(syncInterval);
-
-				lastSentData = JSON.stringify(me.data);
-				syncInterval = setInterval(() => {
-					if (!me.data || !me.ref) return;
-					const currentData = JSON.stringify(me.data);
-					if (currentData !== lastSentData) {
-						me.ref.set(me.data);
-						lastSentData = currentData;
-					}
-				}, 200);
-			}
-
-			function startAdminListener() {
-				if (!me.ref) return;
-				me.ref.on("value", (snapshot) => {
-					const serverData = snapshot.val();
-					if (!serverData || !me.data) return;
-
-					for (let key in serverData) {
-						if (!(key in me.data)) continue;
-						if (serverData[key] !== me.data[key]) {
-							me.data[key] = serverData[key];
-
-							if (key === "color" && me.model) {
-								me.model.material.color = new THREE.Color(
-									"hsl(" + serverData[key] + ", 100%, 50%)"
-								);
-							}
-
-							if (key === "name" && me.label) {
-								me.label.innerHTML =
-									serverData[key].replaceAll("<", "&lt;") + "<br/>|";
-							}
-						}
+				
+				database.ref(code + "/players").on("child_added", function(p){
+					console.log(p);
+					players[p.ref_.path.pieces_[2]] = {
+						data: p.val(),
+						model: new THREE.Mesh(new THREE.BoxBufferGeometry(1, 1, 2))
+					};
+					var pl = players[p.ref_.path.pieces_[2]];
+					pl.model.position.set(pl.data.x, 0.6, pl.data.y);
+					pl.model.material = new THREE.MeshLambertMaterial({color: new THREE.Color("hsl(" + pl.data.color + ", 100%, 50%)")});
+					var wheel = new THREE.Mesh(
+						new THREE.CylinderBufferGeometry(0.5, 0.5, 0.2, 10),
+						new THREE.MeshLambertMaterial({color: new THREE.Color("#222")})
+					);
+					var w1 = wheel.clone();
+					w1.position.set(0.6, -0.1, 0.7);
+					w1.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+					pl.model.add(w1);
+					var w2 = wheel.clone();
+					w2.position.set(-0.6, -0.1, 0.7);
+					w2.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+					pl.model.add(w2);
+					var w3 = wheel.clone();
+					w3.position.set(0.6, -0.1, -0.7);
+					w3.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+					pl.model.add(w3);
+					var w4 = wheel.clone();
+					w4.position.set(-0.6, -0.1, -0.7);
+					w4.rotation.set(Math.PI / 2, 0, Math.PI / 2);
+					pl.model.add(w4);
+					var label = document.createElement("DIV");
+					label.className = "label";
+					label.innerHTML = pl.data.name.replaceAll("<", "&lt;") + "<br/>|";
+					pl.label = label;
+					label.position = pl.model.position;
+					console.log(label);
+					f.appendChild(label);
+					labels.push(label);
+					pl.model.receiveShadow = true;
+					scene.add(pl.model);
+					
+					if(p.ref_.path.pieces_[2] == me.ref.path.pieces_[2]){
+						me.label = pl.label;
+						me.model = pl.model;
+						me.label.innerHTML = "";
 					}
 				});
-			}
-
-			startSync();
-			startAdminListener();
-			// --- End of admin sync logic ---
-
-			database.ref(code + "/status").on("value", function (v) {
-				v = v.val();
-				if (v == 1) {
-					document.getElementsByClassName("info")[0].outerHTML = "";
-					document.getElementById("startgame").outerHTML = "";
-
-					gameStarted = true;
-					gameSortaStarted = true;
-
-					var countDown = document.createElement("DIV");
-					countDown.innerHTML = "3";
-					countDown.className = "title";
-					countDown.id = "countdown";
-					f.appendChild(countDown);
-
-					lap = document.createElement("DIV");
-					lap.innerHTML = "1/" + LAPS;
-					lap.className = "title";
-					lap.id = "lap";
-					f.appendChild(lap);
-
-					setTimeout(function () {
-						countDown.innerHTML = "2";
-					}, 1000);
-
-					setTimeout(function () {
-						countDown.innerHTML = "1";
-					}, 2000);
-
-					setTimeout(function () {
-						countDown.innerHTML = "GO!";
-						gameSortaStarted = false;
-					}, 3000);
-
-					setTimeout(function () {
-						countDown.innerHTML = "";
-					}, 4000);
+				
+				database.ref(code + "/players").on("child_changed", function(p){
+					// console.log(p);
+					players[p.ref_.path.pieces_[2]].data = p.val();
+				});
+				
+				me.ref = database.ref(code + "/players").push();
+				me.data = {
+					x: 0,
+					y: 0,
+					xv: 0,
+					yv: 0,
+					dir: 0,
+					steer: 0,
+					color: color,
+					name: name,
+					checkpoint: 1,
+					lap: 0,
+					collision: {}
 				}
-			});
-		} else getCode();
-	});
+				me.ref.set(me.data);
+				
+				database.ref(code + "/status").on("value", function(v){
+					v = v.val();
+					if(v == 1){
+						document.getElementsByClassName("info")[0].outerHTML = "";
+						document.getElementById("startgame").outerHTML = "";
+						
+						gameStarted = true;
+						gameSortaStarted = true;
+						
+						var countDown = document.createElement("DIV");
+						countDown.innerHTML = "3";
+						countDown.className = "title";
+						countDown.id = "countdown";
+						f.appendChild(countDown);
+						
+						lap = document.createElement("DIV");
+						lap.innerHTML = "1/" + LAPS;
+						lap.className = "title";
+						lap.id = "lap";
+						f.appendChild(lap);
+						
+						setTimeout(function(){
+							countDown.innerHTML = "2";
+						}, 1000);
+						
+						setTimeout(function(){
+							countDown.innerHTML = "1";
+						}, 2000);
+						
+						setTimeout(function(){
+							countDown.innerHTML = "GO!";
+							gameSortaStarted = false;
+						}, 3000);
+						
+						setTimeout(function(){
+							countDown.innerHTML = "";
+						}, 4000);
+					}
+				});
+			}else
+				getCode();
+		});
+	}
+	
+	join();
 }
 
-joinGame = function () {
+joinGame = function(){
 	fadeOut(menuMusic);
 	document.getElementById("join").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
-	setTimeout(function () {
-		f.innerHTML =
-			"<div class='info title'>Enter a code to join a game!<input id='incode' class='title' onkeyup='codeCheck(event)' ontouchstart='this.focus()'></input></div>";
-		if (VR) f.innerHTML += "<div id='divider'></div>";
+	setTimeout(function(){
+		f.innerHTML = "<div class='info title'>Enter a code to join a game!<input id='incode' class='title' onkeyup='codeCheck(event)' ontouchstart='this.focus()'></input></div>";
+		if(VR)
+			f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
 		f.style.transform = "none";
 	}, 1000);
 	join();
-};
+}
 
 var map, trees, signs, startc, main;
 
-function deleteMap() {
-	while (map.children.length > 0) map.remove(map.children[0]);
+function deleteMap(){
+	while(map.children.length > 0)
+		map.remove(map.children[0]);
 	scene.remove(map);
-	while (trees.children.length > 0) trees.remove(trees.children[0]);
+	while(trees.children.length > 0)
+		trees.remove(trees.children[0]);
 	scene.remove(trees);
-	while (signs.children.length > 0) signs.remove(signs.children[0]);
+	while(signs.children.length > 0)
+		signs.remove(signs.children[0]);
 	scene.remove(signs);
-	while (startc.children.length > 0) startc.remove(startc.children[0]);
+	while(startc.children.length > 0)
+		startc.remove(startc.children[0]);
 	scene.remove(startc);
-	while (main.children.length > 0) main.remove(main.children[0]);
+	while(main.children.length > 0)
+		main.remove(main.children[0]);
 	scene.remove(main);
 }
 
