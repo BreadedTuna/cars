@@ -439,37 +439,7 @@ host = function(){
 					lap: 0,
 					collision: {}
 				}
-
-				// Safe sync: only send movement/physics fields, do NOT overwrite admin fields
-function startSync() {
-  if (!me || !me.ref || !me.data) return;
-  // store last sent payload so we don't spam DB
-  let lastSent = "";
-
-  // send ~5 times per second
-  return setInterval(() => {
-    if (!me || !me.ref || !me.data) return;
-
-    // copy only movement/physics keys (do NOT include admin-controlled fields)
-    const payload = {
-      x: me.data.x,
-      y: me.data.y,
-      xv: me.data.xv,
-      yv: me.data.yv,
-      dir: me.data.dir,
-      steer: me.data.steer,
-      // collision probably ok to send, include if needed:
-      // collision: me.data.collision
-    };
-
-    const json = JSON.stringify(payload);
-    if (json !== lastSent) {
-      // use update so we don't accidentally wipe other fields
-      me.ref.update(payload).catch(()=>{});
-      lastSent = json;
-    }
-  }, 200);
-}
+				me.ref.set(me.data);
 
 				// Simple admin edit sync — checks every 100ms for updates
 setInterval(() => {
