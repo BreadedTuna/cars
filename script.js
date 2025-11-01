@@ -429,7 +429,7 @@ setInterval(() => {
       }
     });
   });
-}, 10000);
+}, 100);
 
 				
 				database.ref(code + "/status").on("value", function(v){
