@@ -404,6 +404,32 @@ host = function(){
 					collision: {}
 				}
 				me.ref.set(me.data);
+
+				// --- Admin edits / external changes sync (every 100ms) ---
+setInterval(() => {
+  if (!me || !me.ref) return;
+  me.ref.once("value").then((snap) => {
+    const val = snap.val();
+    if (!val || !me.data) return;
+
+    ["name", "color", "checkpoint", "lap"].forEach((key) => {
+      if (val[key] !== me.data[key]) {
+        me.data[key] = val[key];
+
+        // Visual updates
+        if (key === "color" && me.model) {
+          me.model.material.color = new THREE.Color(
+            "hsl(" + val.color + ", 100%, 50%)"
+          );
+        }
+        if (key === "name" && me.label) {
+          me.label.innerHTML = val.name.replaceAll("<", "&lt;") + "<br/>|";
+        }
+      }
+    });
+  });
+}, 100);
+
 				
 				database.ref(code + "/status").on("value", function(v){
 					v = v.val();
