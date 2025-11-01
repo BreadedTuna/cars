@@ -432,7 +432,7 @@ setInterval(() => {
   });
 }, 100);
 				// --- Admin edits / external changes sync (every 100ms) ---
-// --- Sync local -> Firebase only when values change ---
+// (skips admin-controlled fields so they don’t get overwritten)
 let lastSentData = null;
 let syncInterval = null;
 
@@ -440,17 +440,24 @@ function startSync() {
   if (!me.data || !me.ref) return; // wait until setup done
   if (syncInterval) clearInterval(syncInterval);
 
-  lastSentData = JSON.stringify(me.data);
+  lastSentData = "";
   syncInterval = setInterval(() => {
     if (!me.data || !me.ref) return;
-    const currentData = JSON.stringify(me.data);
+
+    // Copy only movement/physics fields — leave admin fields alone
+    const dataToSend = { ...me.data };
+    delete dataToSend.color;
+    delete dataToSend.name;
+    delete dataToSend.checkpoint;
+    delete dataToSend.lap;
+
+    const currentData = JSON.stringify(dataToSend);
     if (currentData !== lastSentData) {
-      me.ref.set(me.data);
+      me.ref.update(dataToSend); // only update these safe fields
       lastSentData = currentData;
     }
   }, 200);
 }
-
 // --- Listen for admin/external edits safely ---
 function startAdminListener() {
   if (!me.ref) return;
