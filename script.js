@@ -403,7 +403,42 @@ host = function(){
 					lap: 0,
 					collision: {}
 				}
-				me.ref.set(me.data);
+				// --- Sync local -> Firebase only when values change ---
+let lastSentData = JSON.stringify(me.data);
+setInterval(() => {
+  const currentData = JSON.stringify(me.data);
+  if (currentData !== lastSentData) {
+    me.ref.set(me.data);
+    lastSentData = currentData;
+  }
+}, 200); // check 5 times per second instead of every frame
+
+// --- Listen for admin changes (or external edits) ---
+me.ref.on("value", (snapshot) => {
+  const serverData = snapshot.val();
+  if (!serverData) return;
+
+  // Compare & apply only differences from the server
+  for (let key in serverData) {
+    if (typeof me.data[key] === "undefined") continue;
+
+    // Only override if it was changed externally
+    if (serverData[key] !== me.data[key]) {
+      // Update local data
+      me.data[key] = serverData[key];
+
+      // If color changed, update the car model live
+      if (key === "color" && me.model) {
+        me.model.material.color = new THREE.Color("hsl(" + serverData[key] + ", 100%, 50%)");
+      }
+
+      // If name changed, update label
+      if (key === "name" && me.label) {
+        me.label.innerHTML = serverData[key].replaceAll("<", "&lt;") + "<br/>|";
+      }
+    }
+  }
+});
 				
 				database.ref(code + "/status").on("value", function(v){
 					v = v.val();
