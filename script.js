@@ -439,7 +439,25 @@ host = function(){
 					lap: 0,
 					collision: {}
 				}
-				me.ref.set(me.data);
+				// --- Only send changed fields to Firebase ---
+if (me && me.ref && me.data) {
+  if (!me.lastSentData) me.lastSentData = {}; // store previous snapshot
+  const diff = {};
+
+  // Compare each key to last sent value
+  for (const key in me.data) {
+    const val = me.data[key];
+    if (me.lastSentData[key] !== val) {
+      diff[key] = val;
+      me.lastSentData[key] = val;
+    }
+  }
+
+  // Only push if there’s at least one difference
+  if (Object.keys(diff).length > 0) {
+    me.ref.update(diff);
+  }
+}
 
 				// Simple admin edit sync — checks every 100ms for updates
 setInterval(() => {
@@ -1187,7 +1205,25 @@ codeCheck = function(){
 					lap: 0,
 					collision: {}
 				}
-				me.ref.set(me.data);
+				// --- Only send changed fields to Firebase ---
+if (me && me.ref && me.data) {
+  if (!me.lastSentData) me.lastSentData = {}; // store previous snapshot
+  const diff = {};
+
+  // Compare each key to last sent value
+  for (const key in me.data) {
+    const val = me.data[key];
+    if (me.lastSentData[key] !== val) {
+      diff[key] = val;
+      me.lastSentData[key] = val;
+    }
+  }
+
+  // Only push if there’s at least one difference
+  if (Object.keys(diff).length > 0) {
+    me.ref.update(diff);
+  }
+}
 				
 				database.ref(code + "/status").on("value", function(v){
 					v = v.val();
