@@ -1,11 +1,15 @@
-// adminui.js — Admin UI with confirm-to-save editing, fixed z-index & pointer issues
+// adminui.js — Admin UI with time-ago, variable interval, improved color handling
+// Modified: removed live (continuous) re-rendering of player lists and replaced immediate DB writes
+// with per-player "tick" (save) buttons. Player lists are fetched on open and can be refreshed manually.
+
 (function () {
   let adminButton, adminPanel;
   let isDragging = false, moved = false, offsetX = 0, offsetY = 0;
-  let intervalMinutes = 3;
-  const livePlayerListeners = {};
 
-  /* ---------- Create "A" admin button (draggable) ---------- */
+  // Default lookback interval (minutes)
+  let intervalMinutes = 3;
+
+  /* ---------- Draggable "A" button ---------- */
   function createAdminButton() {
     adminButton = document.createElement("div");
     Object.assign(adminButton.style, {
@@ -24,15 +28,12 @@
       fontWeight: "bold",
       fontSize: "22px",
       cursor: "pointer",
-      boxShadow: "0 6px 18px rgba(0,0,0,0.5)",
-      zIndex: "2147483647",        // extremely high so it sits above game UI
+      boxShadow: "0 0 8px rgba(0,0,0,0.4)",
+      zIndex: "99999",
       userSelect: "none",
-      touchAction: "auto",         // allow touch interactions
-      pointerEvents: "auto",       // ensure it receives pointer events
+      touchAction: "none",
     });
     adminButton.textContent = "A";
-    adminButton.tabIndex = 0;
-    adminButton.setAttribute("aria-label", "Admin panel");
     adminButton.addEventListener("mousedown", startDrag);
     adminButton.addEventListener("touchstart", startDrag, { passive: false });
     window.addEventListener("mousemove", drag);
@@ -71,7 +72,7 @@
     if (!moved) togglePanel();
   }
 
-  /* ---------- Admin panel creation ---------- */
+  /* ---------- Admin Panel ---------- */
   function createAdminPanel() {
     adminPanel = document.createElement("div");
     Object.assign(adminPanel.style, {
@@ -79,21 +80,19 @@
       right: "80px",
       bottom: "20px",
       width: "380px",
-      maxWidth: "calc(100vw - 40px)",
-      background: "rgba(0,0,0,0.92)",
+      background: "rgba(0,0,0,0.88)",
       color: "#fff",
       borderRadius: "12px",
       fontFamily: "monospace",
       fontSize: "13px",
-      boxShadow: "0 8px 28px rgba(0,0,0,0.6)",
+      boxShadow: "0 0 12px rgba(0,0,0,0.6)",
       display: "none",
-      zIndex: "2147483647",       // extremely high
-      touchAction: "auto",
-      pointerEvents: "auto",
+      zIndex: "99999",
+      touchAction: "none",
     });
 
     adminPanel.innerHTML = `
-      <div id="admin-header" style="cursor:move;font-weight:bold;font-size:15px;padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:12px 12px 0 0;">
+      <div id="admin-header" style="cursor:move;font-weight:bold;font-size:15px;padding:8px;background:rgba(255,255,255,0.06);border-radius:12px 12px 0 0;">
         Admin Panel
       </div>
       <div id="admin-content" style="padding:10px 14px;max-height:72vh;overflow-y:auto;">
@@ -101,33 +100,32 @@
         <div id="admin-claim">Admin Claim: (checking…)</div>
         <div id="admin-db">DB Status: (unknown)</div>
 
-        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;">
           <div style="font-size:12px;">Lookback:</div>
-          <button class="interval" data-min="1" style="cursor:pointer;padding:4px 6px;border-radius:6px">1m</button>
-          <button class="interval" data-min="3" style="cursor:pointer;padding:4px 6px;border-radius:6px;background:#333;color:#fff;">3m</button>
-          <button class="interval" data-min="10" style="cursor:pointer;padding:4px 6px;border-radius:6px">10m</button>
-          <button class="interval" data-min="30" style="cursor:pointer;padding:4px 6px;border-radius:6px">30m</button>
-          <input id="interval-custom" placeholder="min" style="width:56px;margin-left:6px;padding:4px;font-size:12px;border-radius:6px;border:0;background:#111;color:#fff">
-          <button id="interval-apply" style="cursor:pointer;padding:4px 6px;border-radius:6px">Apply</button>
+          <button class="interval" data-min="1" style="cursor:pointer">1m</button>
+          <button class="interval" data-min="3" style="cursor:pointer;background:#333;color:#fff;">3m</button>
+          <button class="interval" data-min="10" style="cursor:pointer">10m</button>
+          <button class="interval" data-min="30" style="cursor:pointer">30m</button>
+          <input id="interval-custom" placeholder="min" style="width:48px;margin-left:6px;padding:2px;font-size:12px;">
+          <button id="interval-apply" style="cursor:pointer;margin-left:4px">Apply</button>
         </div>
 
-        <button id="refresh-games" style="margin-top:8px;width:100%;cursor:pointer;padding:8px;border-radius:8px">🔄 Refresh Games</button>
+        <button id="refresh-games" style="margin-top:8px;width:100%;cursor:pointer;">🔄 Refresh Games</button>
         <div id="admin-game-list" style="margin-top:10px;"></div>
       </div>
     `;
     document.body.appendChild(adminPanel);
 
-    // drag handle
+    // events
     const header = adminPanel.querySelector("#admin-header");
     header.addEventListener("mousedown", startPanelDrag);
     header.addEventListener("touchstart", startPanelDrag, { passive: false });
-
-    // listeners
     document.getElementById("refresh-games").addEventListener("click", loadActiveGames);
     adminPanel.querySelectorAll(".interval").forEach(btn => {
       btn.addEventListener("click", () => {
         intervalMinutes = Number(btn.dataset.min);
-        adminPanel.querySelectorAll(".interval").forEach(b => { b.style.background = ""; b.style.color = ""; });
+        // highlight clicked
+        adminPanel.querySelectorAll(".interval").forEach(b => b.style.background = "");
         btn.style.background = "#333";
         btn.style.color = "#fff";
         loadActiveGames();
@@ -143,7 +141,7 @@
     });
   }
 
-  /* ---------- Panel drag functions ---------- */
+  /* ---------- Panel drag ---------- */
   let panelDragging = false, panelOffsetX = 0, panelOffsetY = 0;
   function startPanelDrag(e) {
     panelDragging = true;
@@ -172,42 +170,38 @@
   }
 
   function togglePanel() {
-    if (!adminPanel) return;
     adminPanel.style.display = adminPanel.style.display === "none" ? "block" : "none";
-    // focus first input if opened
-    if (adminPanel.style.display === "block") {
-      setTimeout(() => {
-        const inp = adminPanel.querySelector("input");
-        if (inp) inp.focus({ preventScroll: true });
-      }, 120);
-    }
   }
 
-  /* ---------- DB & UI helpers ---------- */
+  /* ---------- Admin info + DB test ---------- */
   function updateAdminUI(user, token) {
-    const emailEl = document.getElementById("admin-email");
-    const claimEl = document.getElementById("admin-claim");
-    const dbEl = document.getElementById("admin-db");
-    if (emailEl) emailEl.textContent = "Email: " + (user?.email || "none");
-    if (claimEl) claimEl.textContent = "Admin Claim: " + (token?.claims?.admin ? "true" : "false");
+    document.getElementById("admin-email").textContent = "Email: " + (user?.email || "none");
+    document.getElementById("admin-claim").textContent = "Admin Claim: " + (token?.claims?.admin ? "true" : "false");
 
     firebase.database().ref("/testServer").once("value").then(() => {
-      if (dbEl) dbEl.textContent = "DB Status: ✅ Connected";
+      document.getElementById("admin-db").textContent = "DB Status: ✅ Connected";
     }).catch(() => {
-      if (dbEl) dbEl.textContent = "DB Status: ❌ Error";
+      document.getElementById("admin-db").textContent = "DB Status: ❌ Error";
+    });
+
+    // mark default interval button (3m)
+    adminPanel.querySelectorAll(".interval").forEach(b => {
+      if (Number(b.dataset.min) === intervalMinutes) {
+        b.style.background = "#333"; b.style.color = "#fff";
+      } else { b.style.background = ""; b.style.color = ""; }
     });
 
     loadActiveGames();
   }
 
-  /* ---------- Load active games ---------- */
+  /* ---------- Load active games (uses intervalMinutes) ---------- */
   function loadActiveGames() {
     const list = document.getElementById("admin-game-list");
-    if (!list) return;
     list.innerHTML = "<div>Loading games…</div>";
+    const rootRef = firebase.database().ref("/");
     const lookback = Date.now() - intervalMinutes * 60 * 1000;
 
-    firebase.database().ref("/").once("value").then(snapshot => {
+    rootRef.once("value").then(snapshot => {
       const data = snapshot.val() || {};
       const recent = [];
       Object.keys(data).forEach(code => {
@@ -223,6 +217,7 @@
     });
   }
 
+  /* ---------- Render games + time-ago ---------- */
   function timeAgo(ms) {
     const diff = Date.now() - ms;
     if (diff < 5000) return "just now";
@@ -255,7 +250,7 @@
         <div style="font-weight:bold;">${g.code} <span style="font-weight:normal;color:#ccc;font-size:12px">(${timeAgo(g.timestamp)})</span></div>
       `;
       const controls = document.createElement("div");
-      controls.innerHTML = `<button class="players-btn" style="margin-left:6px;cursor:pointer;padding:6px;border-radius:6px">👁️ View</button> <button class="join-btn" style="margin-left:6px;cursor:pointer;padding:6px;border-radius:6px">🚪 Join</button>`;
+      controls.innerHTML = `<button class="players-btn" style="margin-left:6px;cursor:pointer">👁️</button> <button class="join-btn" style="margin-left:6px;cursor:pointer">🚪 Join</button>`;
       headerRow.appendChild(controls);
       wrap.appendChild(headerRow);
 
@@ -266,15 +261,15 @@
     });
   }
 
-  /* ---------- Live players viewer & editor (confirm-to-save) ---------- */
+  /* ---------- Players viewer & editor (non-live) ----------
+     - Fetch players once when opening the viewer
+     - Provide per-player "tick" (save) button to commit changes
+     - Provide a "Refresh players" button to re-fetch on demand
+  ---------------------------------------------------------*/
   function toggleGamePlayers(code, container) {
     const existing = container.querySelector(".player-list");
     if (existing) {
       existing.remove();
-      if (livePlayerListeners[code]) {
-        livePlayerListeners[code].off();
-        delete livePlayerListeners[code];
-      }
       return;
     }
 
@@ -289,9 +284,9 @@
 
     const playersRef = firebase.database().ref(code + "/players");
 
-    const render = (snap) => {
+    function renderFromSnapshot(snap) {
       const players = snap.val() || {};
-      sub.innerHTML = `<div style="font-weight:bold;margin:4px 0;">Players in ${code}</div>`;
+      sub.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;"><div style="font-weight:bold;margin:4px 0;">Players in ${code}</div><button class="refresh-players" style="cursor:pointer">🔁 Refresh</button></div>`;
       const keys = Object.keys(players);
       if (!keys.length) {
         sub.innerHTML += "<div>No players currently.</div>";
@@ -300,125 +295,115 @@
 
       keys.forEach(id => {
         const p = players[id] || {};
-        const div = document.createElement("div");
-        div.style.margin = "6px 0";
         const colorHex = colorToHex(p.color);
+        const playerDiv = document.createElement("div");
+        playerDiv.style.margin = "6px 0";
+        playerDiv.style.padding = "6px";
+        playerDiv.style.borderRadius = "6px";
+        playerDiv.style.background = "rgba(255,255,255,0.02)";
+        playerDiv.dataset.playerId = id;
 
-        // Build safe edit UI: input + explicit save button
-        div.innerHTML = `
+        // Build inner HTML for fields + save button
+        playerDiv.innerHTML = `
           <div style="font-size:12px;color:#aaa">ID: ${id}</div>
-
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;">
-            <label style="font-size:12px;min-width:40px">Name</label>
-            <input data-field="name" data-id="${id}" data-field-type="text" value="${escapeInput(p.name||"")}" style="flex:1;min-width:100px;padding:6px;font-size:13px;border-radius:6px;border:0;background:#111;color:#fff;pointer-events:auto;">
-            <button class="save-btn" data-field="name" data-id="${id}" style="padding:6px;border-radius:6px;cursor:pointer">✅</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px;">
+            <label style="font-size:12px">Name</label>
+            <input data-field="name" data-id="${id}" value="${escapeInput(p.name||"")}" style="flex:1;min-width:90px;padding:4px;font-size:13px">
+            <label style="font-size:12px">Lap</label>
+            <input type="number" data-field="lap" data-id="${id}" value="${p.lap||0}" style="width:60px;padding:4px;font-size:13px">
+            <label style="font-size:12px">CP</label>
+            <input type="number" data-field="checkpoint" data-id="${id}" value="${p.checkpoint||0}" style="width:60px;padding:4px;font-size:13px">
+            <button class="save-btn" data-id="${id}" title="Save changes" style="cursor:pointer;padding:6px;border-radius:6px;">✔️</button>
           </div>
-
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-            <label style="font-size:12px;min-width:30px">Lap</label>
-            <input type="number" data-field="lap" data-id="${id}" value="${p.lap||0}" style="width:70px;padding:6px;font-size:13px;border-radius:6px;border:0;background:#111;color:#fff;pointer-events:auto;">
-            <button class="save-btn" data-field="lap" data-id="${id}" style="padding:6px;border-radius:6px;cursor:pointer">✅</button>
-
-            <label style="font-size:12px;min-width:26px">CP</label>
-            <input type="number" data-field="checkpoint" data-id="${id}" value="${p.checkpoint||0}" style="width:70px;padding:6px;font-size:13px;border-radius:6px;border:0;background:#111;color:#fff;pointer-events:auto;">
-            <button class="save-btn" data-field="checkpoint" data-id="${id}" style="padding:6px;border-radius:6px;cursor:pointer">✅</button>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+            <label style="font-size:12px">Color</label>
+            <input type="color" data-field="color" data-id="${id}" value="${colorHex}" style="width:44px;height:30px;padding:2px;">
+            <div class="color-preview" style="width:24px;height:24px;border-radius:4px;background:${colorHex};border:1px solid rgba(0,0,0,0.2)"></div>
           </div>
-
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-            <label style="font-size:12px;min-width:40px">Color</label>
-            <input type="color" data-field="color" data-id="${id}" value="${colorHex}" style="width:44px;height:32px;padding:2px;border-radius:6px;border:0;background:#fff;cursor:pointer;">
-            <button class="save-btn" data-field="color" data-id="${id}" style="padding:6px;border-radius:6px;cursor:pointer">✅</button>
-            <div class="color-preview" style="width:28px;height:28px;border-radius:6px;background:${colorHex};border:1px solid rgba(0,0,0,0.2)"></div>
-          </div>
-
-          <hr style="border:none;border-bottom:1px solid rgba(255,255,255,0.08);margin:8px 0;">
         `;
+        sub.appendChild(playerDiv);
 
-        sub.appendChild(div);
-      });
-
-      // attach handlers: save buttons
-      sub.querySelectorAll(".save-btn").forEach(btn => {
-        btn.style.pointerEvents = "auto";
-        btn.addEventListener("click", (ev) => {
-          const field = btn.dataset.field;
-          const id = btn.dataset.id;
-          // find input matching this id+field - search whole block
-          const input = sub.querySelector(`input[data-id="${id}"][data-field="${field}"], input[data-id="${id}"][data-field-type="text"][data-field="${field}"]`) || sub.querySelector(`input[data-id="${id}"][data-field="${field}"]`);
-          // fallback: try input within same parent
-          const inputCandidate = input || btn.parentElement.querySelector(`input[data-id="${id}"]`);
-          if (inputCandidate) handleEdit({ target: inputCandidate }, code, btn);
+        // wire up color preview update locally (no DB write yet)
+        const colorInput = playerDiv.querySelector('input[type="color"]');
+        const preview = playerDiv.querySelector(".color-preview");
+        colorInput.addEventListener("input", () => {
+          if (preview) preview.style.background = colorInput.value;
         });
-      });
+        // allow pressing Enter to blur (mobile friendly)
+        playerDiv.querySelectorAll('input[type="text"], input[type="number"]').forEach(inp => {
+          inp.addEventListener("keydown", (ev) => {
+            if (ev.key === "Enter") ev.target.blur();
+          });
+        });
 
-      // Enter key saves
-      sub.querySelectorAll("input").forEach(inp => {
-        inp.addEventListener("keydown", ev => {
-          if (ev.key === "Enter") {
-            ev.preventDefault();
-            const parent = inp.parentElement;
-            const btn = parent.querySelector(`.save-btn[data-field="${inp.dataset.field}"]`) || parent.querySelector(".save-btn");
-            if (btn) btn.click();
+        // save button handler
+        const saveBtn = playerDiv.querySelector(".save-btn");
+        saveBtn.addEventListener("click", async () => {
+          const id = saveBtn.dataset.id;
+          const nameInp = playerDiv.querySelector('input[data-field="name"][data-id="' + id + '"]');
+          const lapInp = playerDiv.querySelector('input[data-field="lap"][data-id="' + id + '"]');
+          const cpInp = playerDiv.querySelector('input[data-field="checkpoint"][data-id="' + id + '"]');
+          const colorInp = playerDiv.querySelector('input[data-field="color"][data-id="' + id + '"]');
+
+          const updates = {};
+          if (nameInp) updates.name = nameInp.value;
+          if (lapInp) updates.lap = Number(lapInp.value) || 0;
+          if (cpInp) updates.checkpoint = Number(cpInp.value) || 0;
+
+          // Perform update: for color we need to convert hex -> hue number
+          try {
+            // update non-color fields in one call
+            if (Object.keys(updates).length) {
+              await firebase.database().ref(`${code}/players/${id}`).update(updates);
+            }
+            if (colorInp) {
+              const hex = colorInp.value;
+              const rgb = hexToRgbArray(hex);
+              const hue = Math.round(rgbToHue(rgb));
+              await firebase.database().ref(`${code}/players/${id}/color`).set(hue);
+            }
+            // optional: give subtle feedback (flash)
+            saveBtn.textContent = "✓";
+            setTimeout(() => { saveBtn.textContent = "✔️"; }, 900);
+          } catch (err) {
+            console.error("Error saving player:", err);
+            saveBtn.textContent = "❌";
+            setTimeout(() => { saveBtn.textContent = "✔️"; }, 1500);
           }
         });
+      }); // keys.forEach
 
-        // update color preview on change (but do NOT write to DB until save)
-        if (inp.type === "color") {
-          inp.addEventListener("input", (ev) => {
-            const preview = inp.parentElement.querySelector(".color-preview");
-            if (preview) preview.style.background = ev.target.value;
+      // wire up refresh players button
+      const refreshBtn = sub.querySelector(".refresh-players");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", () => {
+          // small UI hint
+          refreshBtn.textContent = "Loading…";
+          playersRef.once("value").then(snap => {
+            renderFromSnapshot(snap);
+          }).finally(() => {
+            setTimeout(() => { refreshBtn.textContent = "🔁 Refresh"; }, 300);
           });
-        }
-      });
-    };
-
-    playersRef.on("value", render);
-    livePlayerListeners[code] = playersRef;
-  }
-
-  /* ---------- Handle admin edits (save on confirm) ---------- */
-  function handleEdit(e, code, btnEl) {
-    const field = e.target.dataset.field;
-    const id = e.target.dataset.id;
-    const raw = e.target.value;
-    const ref = firebase.database().ref(`${code}/players/${id}/${field}`);
-
-    let valToSet = raw;
-    if (field === "color") {
-      // convert hex to hue index (0-360)
-      const rgb = hexToRgbArray(raw);
-      const hue = rgbToHue(rgb);
-      valToSet = Math.round(hue);
-    } else if (field === "lap" || field === "checkpoint") {
-      valToSet = Number(raw) || 0;
-    } else {
-      // sanitize small amount for DB (we already escaped display)
-      valToSet = raw;
-    }
-
-    // write single key (update using ref.set on that child)
-    ref.set(valToSet).then(() => {
-      if (btnEl) {
-        btnEl.textContent = "💾";
-        setTimeout(() => { btnEl.textContent = "✅"; }, 700);
+        });
       }
-    }).catch(err => {
-      console.error("Admin update failed:", err);
-      if (btnEl) { btnEl.textContent = "⚠️"; setTimeout(()=>btnEl.textContent = "✅", 1200); }
-    });
+    } // renderFromSnapshot
 
-    // update preview color (visual only)
-    if (field === "color") {
-      const preview = e.target.parentElement.querySelector(".color-preview");
-      if (preview) preview.style.background = raw;
-    }
+    // initial fetch (non-live)
+    playersRef.once("value").then(renderFromSnapshot).catch(err => {
+      console.error("Error loading players:", err);
+      sub.innerHTML = "<div>Error loading players.</div>";
+    });
   }
 
   function escapeInput(s) {
     return String(s).replace(/"/g, '&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  /* ---------- Color helpers ---------- */
+  /* ---------- Color mapping helpers ----------
+     - Accept both [r,g,b] arrays (legacy) and numeric color indices/hues.
+     - If numeric <= 100: treat as 0-100 index and map to hue = index * 3.6
+     - If numeric > 100: treat as hue 0-360 (mod 360)
+  ------------------------------------------------*/
   function colorToHex(colorVal) {
     if (Array.isArray(colorVal) && colorVal.length >= 3) {
       const [r,g,b] = colorVal.map(v => Math.max(0, Math.min(255, Number(v)||0)));
@@ -426,16 +411,17 @@
     }
     if (typeof colorVal === "number") {
       let hue;
-      if (colorVal <= 100) hue = (colorVal * 3.6) % 360;
-      else hue = colorVal % 360;
+      if (colorVal <= 100) hue = (colorVal * 3.6) % 360; // index 0-100 → hue
+      else hue = colorVal % 360; // treat as hue directly
       const rgb = hslToRgb(hue/360, 1, 0.5).map(v => Math.round(v));
       return rgbToHex(rgb);
     }
+    // unknown type
     return "#999999";
   }
 
   function hexToRgbArray(hex) {
-    const h = String(hex || "#999").replace('#','').padStart(6,'0').slice(0,6);
+    const h = hex.replace('#','');
     const bigint = parseInt(h,16);
     return [ (bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255 ];
   }
@@ -465,6 +451,7 @@
     return [ r*255, g*255, b*255 ];
   }
 
+  // Convert rgb (array [r,g,b]) to hue 0-360
   function rgbToHue(rgb) {
     const [r,g,b] = rgb.map(v => v/255);
     const max = Math.max(r,g,b), min = Math.min(r,g,b);
@@ -476,7 +463,7 @@
     return h;
   }
 
-  /* ---------- Join as admin convenience (preserve earlier logic) ---------- */
+  /* ---------- Join as admin (watch players, timeout) ---------- */
   function joinGameAsAdmin(code) {
     const statusRef = firebase.database().ref(code + "/status");
     const playersRef = firebase.database().ref(code + "/players");
@@ -509,13 +496,6 @@
         if (!adminPanel) createAdminPanel();
         updateAdminUI(user, token);
       }
-    }).catch(err => {
-      console.error("Auth token error", err);
     });
   });
-
-  // ensure panel exists early (in case auth is immediate)
-  if (!adminPanel && document.readyState !== "loading") {
-    // do nothing until auth triggers creation
-  }
 })();
