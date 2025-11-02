@@ -29,7 +29,7 @@
       fontSize: "22px",
       cursor: "pointer",
       boxShadow: "0 0 8px rgba(0,0,0,0.4)",
-      zIndex: "99999",
+      zIndex: "2147483647",
       userSelect: "none",
       touchAction: "none",
     });
@@ -87,7 +87,7 @@
       fontSize: "13px",
       boxShadow: "0 0 12px rgba(0,0,0,0.6)",
       display: "none",
-      zIndex: "99999",
+      zIndex: "2147483647",
       touchAction: "none",
     });
 
