@@ -260,104 +260,127 @@
 
   /* ---------- Live players viewer & editor ---------- */
   const livePlayerListeners = {};
-  function toggleGamePlayers(code, container) {
-    const existing = container.querySelector(".player-list");
-    if (existing) {
-      existing.remove();
-      if (livePlayerListeners[code]) {
-        livePlayerListeners[code].off();
-        delete livePlayerListeners[code];
-      }
+   const sub = document.createElement("div");
+  sub.className = "player-list";
+  sub.style.marginLeft = "8px";
+  sub.style.borderLeft = "2px solid rgba(255,255,255,0.12)";
+  sub.style.paddingLeft = "8px";
+  sub.style.marginTop = "6px";
+  sub.textContent = "Loading players…";
+  container.appendChild(sub);
+
+  const playersRef = firebase.database().ref(code + "/players");
+
+  const render = (snap) => {
+    const players = snap.val() || {};
+    sub.innerHTML = `<div style="font-weight:bold;margin:4px 0;">Players in ${code}</div>`;
+    const keys = Object.keys(players);
+    if (!keys.length) {
+      sub.innerHTML += "<div>No players currently.</div>";
       return;
     }
 
-    const sub = document.createElement("div");
-    sub.className = "player-list";
-    sub.style.marginLeft = "8px";
-    sub.style.borderLeft = "2px solid rgba(255,255,255,0.12)";
-    sub.style.paddingLeft = "8px";
-    sub.style.marginTop = "6px";
-    sub.textContent = "Loading players…";
-    container.appendChild(sub);
+    keys.forEach(id => {
+      const p = players[id] || {};
+      const div = document.createElement("div");
+      div.style.margin = "6px 0";
+      const colorHex = colorToHex(p.color);
 
-    const playersRef = firebase.database().ref(code + "/players");
+      div.innerHTML = `
+        <div style="font-size:12px;color:#aaa">ID: ${id}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px;">
+          <label style="font-size:12px">Name</label>
+          <input data-field="name" data-id="${id}" value="${escapeInput(p.name||"")}" 
+                 style="flex:1;min-width:90px;padding:4px;font-size:13px">
+          <button data-field="name" data-id="${id}" class="save-btn" style="padding:3px 6px;cursor:pointer;">✅</button>
+        </div>
 
-    const render = (snap) => {
-      const players = snap.val() || {};
-      sub.innerHTML = `<div style="font-weight:bold;margin:4px 0;">Players in ${code}</div>`;
-      const keys = Object.keys(players);
-      if (!keys.length) {
-        sub.innerHTML += "<div>No players currently.</div>";
-        return;
-      }
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px;">
+          <label style="font-size:12px">Lap</label>
+          <input type="number" data-field="lap" data-id="${id}" value="${p.lap||0}" 
+                 style="width:60px;padding:4px;font-size:13px">
+          <button data-field="lap" data-id="${id}" class="save-btn" style="padding:3px 6px;cursor:pointer;">✅</button>
 
-      keys.forEach(id => {
-        const p = players[id] || {};
-        const div = document.createElement("div");
-        div.style.margin = "6px 0";
-        const colorHex = colorToHex(p.color);
-        // build inputs (mobile friendly)
-        div.innerHTML = `
-          <div style="font-size:12px;color:#aaa">ID: ${id}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px;">
-            <label style="font-size:12px">Name</label>
-            <input data-field="name" data-id="${id}" value="${escapeInput(p.name||"")}" style="flex:1;min-width:90px;padding:4px;font-size:13px">
-            <label style="font-size:12px">Lap</label>
-            <input type="number" data-field="lap" data-id="${id}" value="${p.lap||0}" style="width:60px;padding:4px;font-size:13px">
-            <label style="font-size:12px">CP</label>
-            <input type="number" data-field="checkpoint" data-id="${id}" value="${p.checkpoint||0}" style="width:60px;padding:4px;font-size:13px">
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
-            <label style="font-size:12px">Color</label>
-            <input type="color" data-field="color" data-id="${id}" value="${colorHex}" style="width:44px;height:30px;padding:2px;">
-            <div style="width:24px;height:24px;border-radius:4px;background:${colorHex};border:1px solid rgba(0,0,0,0.2)"></div>
-          </div>
-          <hr style="border:none;border-bottom:1px solid rgba(255,255,255,0.08);margin:8px 0;">
-        `;
-        sub.appendChild(div);
+          <label style="font-size:12px">CP</label>
+          <input type="number" data-field="checkpoint" data-id="${id}" value="${p.checkpoint||0}" 
+                 style="width:60px;padding:4px;font-size:13px">
+          <button data-field="checkpoint" data-id="${id}" class="save-btn" style="padding:3px 6px;cursor:pointer;">✅</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-top:6px;">
+          <label style="font-size:12px">Color</label>
+          <input type="color" data-field="color" data-id="${id}" value="${colorHex}" 
+                 style="width:44px;height:30px;padding:2px;">
+          <button data-field="color" data-id="${id}" class="save-btn" style="padding:3px 6px;cursor:pointer;">✅</button>
+          <div style="width:24px;height:24px;border-radius:4px;background:${colorHex};
+                      border:1px solid rgba(0,0,0,0.2)"></div>
+        </div>
+
+        <hr style="border:none;border-bottom:1px solid rgba(255,255,255,0.08);margin:8px 0;">
+      `;
+      sub.appendChild(div);
+    });
+
+    // Save buttons click
+    sub.querySelectorAll(".save-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const id = e.target.dataset.id;
+        const field = e.target.dataset.field;
+        const input = sub.querySelector(`input[data-id="${id}"][data-field="${field}"]`);
+        handleEdit({ target: input }, code, e.target);
       });
+    });
 
-      // attach handlers
-      sub.querySelectorAll("input").forEach(inp => {
-        inp.addEventListener("input", (e) => handleEdit(e, code));
-        // mobile-friendly: also blur on enter for text fields
-        inp.addEventListener("keydown", (ev) => {
-          if (ev.key === "Enter") ev.target.blur();
-        });
+    // Press Enter to save (for text/number inputs)
+    sub.querySelectorAll("input").forEach(inp => {
+      inp.addEventListener("keydown", ev => {
+        if (ev.key === "Enter") {
+          const saveBtn = inp.parentElement.querySelector(`.save-btn[data-field="${inp.dataset.field}"]`);
+          if (saveBtn) saveBtn.click();
+        }
       });
-    };
+    });
+  };
 
-    // live update
-    playersRef.on("value", render);
-    livePlayerListeners[code] = playersRef;
-  }
+  playersRef.on("value", render);
+  livePlayerListeners[code] = playersRef;
+}
 
   function escapeInput(s) {
     return String(s).replace(/"/g, '&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  function handleEdit(e, code) {
-    const field = e.target.dataset.field;
-    const id = e.target.dataset.id;
-    const raw = e.target.value;
-    const ref = firebase.database().ref(`${code}/players/${id}/${field}`);
+  function handleEdit(e, code, btnEl) {
+  const field = e.target.dataset.field;
+  const id = e.target.dataset.id;
+  const raw = e.target.value;
+  const ref = firebase.database().ref(`${code}/players/${id}/${field}`);
 
-    if (field === "color") {
-      // convert hex to hue index (0-360) to preserve richer colors
-      const rgb = hexToRgbArray(raw);
-      const hue = rgbToHue(rgb);
-      // store hue as number (your DB example used numbers like 57,248,316)
-      ref.set(Math.round(hue));
-      // update preview box if present
-      const preview = e.target.parentElement.querySelector('div');
-      if (preview) preview.style.background = raw;
-    } else if (field === "lap" || field === "checkpoint") {
-      const n = Number(raw) || 0;
-      ref.set(n);
-    } else {
-      ref.set(raw);
-    }
+  let valToSet = raw;
+  if (field === "color") {
+    const rgb = hexToRgbArray(raw);
+    const hue = rgbToHue(rgb);
+    valToSet = Math.round(hue);
+  } else if (field === "lap" || field === "checkpoint") {
+    valToSet = Number(raw) || 0;
   }
+
+  ref.set(valToSet).then(() => {
+    if (btnEl) {
+      btnEl.textContent = "💾";
+      setTimeout(() => (btnEl.textContent = "✅"), 800);
+    }
+  }).catch(err => {
+    console.error("Admin update failed:", err);
+    if (btnEl) btnEl.textContent = "⚠️";
+  });
+
+  // Update preview color
+  if (field === "color") {
+    const preview = e.target.parentElement.querySelector("div");
+    if (preview) preview.style.background = raw;
+  }
+}
 
   /* ---------- Color mapping helpers ----------
      - Accept both [r,g,b] arrays (legacy) and numeric color indices/hues.
