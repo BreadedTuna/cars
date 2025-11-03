@@ -25,19 +25,51 @@
   /* -------- Google sign-in -------- */
   function googleLogin() {
     var provider = new firebase.auth.GoogleAuthProvider();
-    firebase
-      .auth()
-      .signInWithPopup(provider)
-      .then(function(result) {
-        var user = result.user;
-        console.log("Google sign-in attempt:", user.email);
-        // we'll check permission after auth state update
-      })
-      .catch(function(error) {
-        console.error("❌ Google sign-in error:", error);
-        statusText.textContent = "Sign-in failed: " + (error.message || error.code);
-      });
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      console.log("📱 Using redirect sign-in (mobile-safe)");
+      statusText.textContent = "Redirecting to Google sign-in...";
+      firebase
+        .auth()
+        .signInWithRedirect(provider)
+        .catch(function(error) {
+          console.error("❌ Google redirect sign-in error:", error);
+          statusText.textContent =
+            "Sign-in failed: " + (error.message || error.code);
+        });
+    } else {
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(function(result) {
+          var user = result.user;
+          console.log("Google sign-in attempt:", user.email);
+        })
+        .catch(function(error) {
+          console.error("❌ Google sign-in error:", error);
+          statusText.textContent =
+            "Sign-in failed: " + (error.message || error.code);
+        });
+    }
   }
+
+  /* -------- Handle redirect result (mobile flow) -------- */
+  firebase
+    .auth()
+    .getRedirectResult()
+    .then(function(result) {
+      if (result.user) {
+        console.log("✅ Redirect sign-in successful:", result.user.email);
+      }
+    })
+    .catch(function(error) {
+      if (error && error.code) {
+        console.error("❌ Redirect sign-in error:", error);
+        statusText.textContent =
+          "Sign-in failed: " + (error.message || error.code);
+      }
+    });
 
   /* -------- Desktop keybind -------- */
   window.addEventListener("keydown", function(e) {
@@ -90,21 +122,24 @@
     }
 
     // Check ID token for admin claim
-    user.getIdTokenResult().then(function(idTokenResult) {
-      const isAdmin = !!idTokenResult.claims.admin;
-      if (user.email.toLowerCase() === allowedEmail && isAdmin) {
-        console.log("✅ Authorized admin:", user.email);
-        statusText.textContent = "Signed in as admin: " + user.email;
-        // you can reveal admin UI here
-      } else {
-        console.warn("❌ Unauthorized email or no admin claim:", user.email);
-        statusText.textContent = "Permission denied (" + user.email + ")";
-        alert("Permission denied: this Google account is not authorized.");
-        firebase.auth().signOut();
-      }
-    }).catch(function(err) {
-      console.error("Error reading token:", err);
-      statusText.textContent = "Permission check failed";
-    });
+    user
+      .getIdTokenResult()
+      .then(function(idTokenResult) {
+        const isAdmin = !!idTokenResult.claims.admin;
+        if (user.email.toLowerCase() === allowedEmail && isAdmin) {
+          console.log("✅ Authorized admin:", user.email);
+          statusText.textContent = "Signed in as admin: " + user.email;
+          // Reveal admin UI here if needed
+        } else {
+          console.warn("❌ Unauthorized email or no admin claim:", user.email);
+          statusText.textContent = "Permission denied (" + user.email + ")";
+          alert("Permission denied: this Google account is not authorized.");
+          firebase.auth().signOut();
+        }
+      })
+      .catch(function(err) {
+        console.error("Error reading token:", err);
+        statusText.textContent = "Permission check failed";
+      });
   });
 })();
