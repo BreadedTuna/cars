@@ -312,34 +312,47 @@ menu2 = function(){
 }
 
 host = function() {
-	fadeOut(menuMusic);
-	document.getElementById("host").onclick = null;
-	f.style.transform = "translate3d(0, -100vh, 0)";
-	setTimeout(function() {
-		// preserve original structure
-		f.innerHTML = `
-			<div class='info title'>
-				Use this code to join the game!
-				<div id='code'>Loading...</div>
-			</div>
-			<div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>
-		`;
+  fadeOut(menuMusic);
+  document.getElementById("host").onclick = null;
+  f.style.transform = "translate3d(0, -100vh, 0)";
 
-		// ✅ add the new Settings button separately (after innerHTML is set)
-		const settingsBtn = document.createElement("div");
-		settingsBtn.id = "settingsgame";
-		settingsBtn.className = "title";
-		settingsBtn.textContent = "Settings";
-		settingsBtn.onclick = openSettings;
-		settingsBtn.ontouchstart = function() { this.click(); };
+  setTimeout(function() {
+    // Clear menu and build elements
+    f.innerHTML = "";
 
-		// append buttons and track element properly
-		f.appendChild(settingsBtn);
-		if (VR) f.innerHTML += "<div id='divider'></div>";
-		f.appendChild(element);
-		f.style.transform = "none";
-		getCode();
-	}, 1000);
+    const infoDiv = document.createElement("div");
+    infoDiv.className = "info title";
+    infoDiv.innerHTML = "Use this code to join the game!<div id='code'>Loading...</div>";
+
+    const startBtn = document.createElement("div");
+    startBtn.id = "startgame";
+    startBtn.className = "title";
+    startBtn.textContent = "Start!";
+    startBtn.onclick = startGame;
+    startBtn.ontouchstart = () => startBtn.click();
+
+    const settingsBtn = document.createElement("div");
+    settingsBtn.id = "settingsgame";
+    settingsBtn.className = "title";
+    settingsBtn.textContent = "Settings";
+    settingsBtn.onclick = openSettings;
+    settingsBtn.ontouchstart = () => settingsBtn.click();
+
+    f.appendChild(infoDiv);
+    f.appendChild(startBtn);
+    f.appendChild(settingsBtn);
+
+    if (VR) {
+      const divider = document.createElement("div");
+      divider.id = "divider";
+      f.appendChild(divider);
+    }
+
+    f.appendChild(element);
+    f.style.transform = "none";
+
+    getCode();
+  }, 1000);
 };
 
 	function getCode(){
