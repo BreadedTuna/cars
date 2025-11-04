@@ -307,18 +307,36 @@ menu2 = function(){
 	}, 500);
 }
 
-host = function(){
-	fadeOut(menuMusic)
+host = function() {
+	fadeOut(menuMusic);
 	document.getElementById("host").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
-	setTimeout(function(){
-		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>";
-		if(VR)
-			f.innerHTML += "<div id='divider'></div>";
+	setTimeout(function() {
+		// preserve original structure
+		f.innerHTML = `
+			<div class='info title'>
+				Use this code to join the game!
+				<div id='code'>Loading...</div>
+			</div>
+			<div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>
+		`;
+
+		// ✅ add the new Settings button separately (after innerHTML is set)
+		const settingsBtn = document.createElement("div");
+		settingsBtn.id = "settingsgame";
+		settingsBtn.className = "title";
+		settingsBtn.textContent = "Settings";
+		settingsBtn.onclick = openSettings;
+		settingsBtn.ontouchstart = function() { this.click(); };
+
+		// append buttons and track element properly
+		f.appendChild(settingsBtn);
+		if (VR) f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
 		f.style.transform = "none";
 		getCode();
 	}, 1000);
+};
 	
 	function getCode(){
 		code = "";
