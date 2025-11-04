@@ -264,6 +264,10 @@ updateColor = function(){
 }
 updateColor();
 
+function openSettings() {
+	console.log("Settings button clicked — coming soon!");
+}
+
 menu2 = function(){
 	fadeIn(menuMusic)
 	if(mobile){
@@ -337,7 +341,7 @@ host = function() {
 		getCode();
 	}, 1000);
 };
-	
+
 	function getCode(){
 		code = "";
 		var letters = "ABCDEFGHIJKLMMNOPQRSTUVWXYZ";
@@ -477,6 +481,7 @@ if (me && me.ref && me.data) {
   }
 }
 
+				
 				// Simple admin edit sync — checks every 100ms for updates
 setInterval(() => {
   if (!me || !me.ref) return;
