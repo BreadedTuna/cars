@@ -352,6 +352,28 @@ input{
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 	-webkit-transform: scale(0.9);
 	        transform: scale(0.9);
+
+
+#settingsgame {
+	position: absolute;
+	bottom: 5vmin;
+	left: 5vmin;
+	color: white;
+	border: 1vmin solid white;
+	background-color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	font-size: 10vmin;
+	padding: 2vmin;
+	transition: box-shadow .2s, transform .2s;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+	z-index: 100000;
+}
+
+#settingsgame:hover {
+	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
+	transform: scale(0.9);
+}
+	
 }
 .label{
 	font-family: "Press Start 2P";
