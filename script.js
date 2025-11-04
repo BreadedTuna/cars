@@ -319,6 +319,14 @@ host = function(){
 		f.style.transform = "none";
 		getCode();
 	}, 1000);
+
+	function openSettings(){
+  f.style.transform = "translate3d(0, -100vh, 0)";
+  setTimeout(() => {
+    f.innerHTML = "<div class='info title'>Settings menu here</div>";
+    f.style.transform = "none";
+  }, 500);
+}
 	
 	function getCode(){
 		code = "";
