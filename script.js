@@ -307,29 +307,18 @@ menu2 = function(){
 	}, 500);
 }
 
-host = function() {
-	fadeOut(menuMusic);
+host = function(){
+	fadeOut(menuMusic)
 	document.getElementById("host").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
-	setTimeout(function() {
-		// Main Start button (existing)
-		let content = `
-			<div class='info title'>
-				Use this code to join the game!
-				<div id='code'>Loading...</div>
-			</div>
-			<div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>
-			<div id='settingsgame' class='title' onclick='openSettings();' ontouchstart='this.click()'>Settings</div>
-		`;
-
-		// Add the HTML and VR divider if needed
-		f.innerHTML = content;
-		if (VR) f.innerHTML += "<div id='divider'></div>";
+	setTimeout(function(){
+		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div>";
+		if(VR)
+			f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
 		f.style.transform = "none";
 		getCode();
 	}, 1000);
-};
 	
 	function getCode(){
 		code = "";
