@@ -1314,8 +1314,13 @@ function startSettings() {
 				<span id="closeSettings" class="closeBtn">✖</span>
 			</div>
 
-			<div id="settingsOptions">
-				<div class="settingsOption">
+			<div id="settingsContent">
+	<div id="settingsHeader">
+		<span id="settingsTitle">Settings</span>
+		<span id="closeSettings" class="closeBtn">✖</span>
+	</div>
+
+	<div id="settingsOptions">
 					<span>Private Game:</span>
 					<label class="toggle">
 						<input type="checkbox" id="privateToggle">
