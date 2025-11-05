@@ -555,6 +555,7 @@ startAdminListener();
 					if(v == 1){
 						document.getElementsByClassName("info")[0].outerHTML = "";
 						document.getElementById("startgame").outerHTML = "";
+						document.getElementById("startsettings").outerHTML = "";
 						
 						gameStarted = true;
 						gameSortaStarted = true;
