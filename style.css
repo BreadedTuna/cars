@@ -354,7 +354,7 @@ input{
 	        transform: scale(0.9);
 
 
-#settingsgame {
+#startsettings {
 	position: absolute;
 	bottom: 5vmin;
 	left: 5vmin;
@@ -369,7 +369,7 @@ input{
 	z-index: 100000;
 }
 
-#settingsgame:hover {
+#startsettings:hover {
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 	transform: scale(0.9);
 }
