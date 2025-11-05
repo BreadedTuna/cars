@@ -312,17 +312,13 @@ host = function(){
 	document.getElementById("host").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
 	setTimeout(function(){
-		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div><div id='startsettings' class='title' onclick='startGame();' ontouchstart='this.click()'>Settings</div>";
+		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div><div id='startsettings' class='title' onclick='startSettings();' ontouchstart='this.click()'>Settings</div>";
 		if(VR)
 			f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
 		f.style.transform = "none";
 		getCode();
 	}, 1000);
-
-	function openSettings(){
-		alert(1234);
-}
 	
 	function getCode(){
 		code = "";
