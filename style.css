@@ -384,7 +384,7 @@ input{
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: rgba(0, 0, 0, 0.7); /* darker overlay */
+	background-color: rgba(0, 0, 0, 0.7);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -402,7 +402,7 @@ input{
 #settingsContent {
 	position: relative;
 	border: 1vmin solid white;
-	background-color: rgba(0, 0, 0, 0.9); /* less transparent */
+	background-color: rgba(0, 0, 0, 0.9);
 	padding: 4vmin;
 	width: 70vw;
 	max-width: 800px;
@@ -410,19 +410,12 @@ input{
 	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.6);
 	display: flex;
 	flex-direction: column;
-}
-
-#settingsTitle {
-	color: white;
-	font-size: 8vmin;
-	text-shadow: 0 0 1vmin white;
-	margin: 0;
-	text-align: left;
+	justify-content: space-between;
 }
 
 #settingsOptions {
 	position: absolute;
-	top: 6vmin;
+	top: 5vmin;
 	right: 5vmin;
 	text-align: right;
 }
@@ -430,9 +423,73 @@ input{
 .settingsOption {
 	color: white;
 	font-family: "Press Start 2P", monospace;
-	font-size: 2.5vmin;
-	margin: 1.5vmin 0;
+	font-size: 1.8vmin;
+	margin: 2vmin 0;
 	text-shadow: 0 0 1vmin black;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 2vmin;
+}
+
+/* input boxes */
+#settingsOptions input[type="text"],
+#settingsOptions input[type="number"] {
+	font-family: inherit;
+	font-size: 1.8vmin;
+	color: white;
+	background: rgba(255, 255, 255, 0.1);
+	border: 0.5vmin solid white;
+	padding: 0.5vmin 1vmin;
+	width: 20vmin;
+	text-align: center;
+}
+
+/* toggle switch */
+.toggle {
+	position: relative;
+	display: inline-block;
+	width: 6vmin;
+	height: 3vmin;
+}
+
+.toggle input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #555;
+	border: 0.3vmin solid white;
+	border-radius: 3vmin;
+	transition: 0.3s;
+}
+
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 2vmin;
+	width: 2vmin;
+	left: 0.5vmin;
+	bottom: 0.5vmin;
+	background-color: white;
+	transition: 0.3s;
+	border-radius: 50%;
+}
+
+.toggle input:checked + .slider {
+	background-color: #6eb0ea;
+}
+
+.toggle input:checked + .slider:before {
+	transform: translateX(3vmin);
 }
 
 #closeSettings {
@@ -440,11 +497,12 @@ input{
 	bottom: 4vmin;
 	left: 50%;
 	transform: translateX(-50%);
-	font-size: 5vmin !important;
+	font-size: 4vmin !important;
 	width: auto;
 	display: inline-block;
 	background-color: rgba(255, 255, 255, 0.05);
 }
+
 
 
 
