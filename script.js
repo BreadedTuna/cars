@@ -1303,22 +1303,52 @@ function startGame(){
 }
 
 function startSettings() {
-	// If already open, don’t open another
 	if (document.getElementById("settingsMenu")) return;
 
-	// Create menu container
 	const menu = document.createElement("div");
 	menu.id = "settingsMenu";
 	menu.innerHTML = `
 		<div id="settingsContent">
-			<div id="settingsTitle" class="title">SETTINGS</div>
-			<div class="settingsOption">Map Theme: <span class="value">Classic</span></div>
-			<div class="settingsOption">Trees: <span class="value">Normal</span></div>
-			<div class="settingsOption">Lighting: <span class="value">Day</span></div>
+			<div id="settingsOptions">
+				<div class="settingsOption">
+					<span>Private Game:</span>
+					<label class="toggle">
+						<input type="checkbox" id="privateToggle">
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="settingsOption">
+					<span>Map:</span>
+					<input type="text" id="mapInput" placeholder="Map name">
+				</div>
+
+				<div class="settingsOption">
+					<span>Cast Shadows:</span>
+					<label class="toggle">
+						<input type="checkbox" id="shadowsToggle" checked>
+						<span class="slider"></span>
+					</label>
+				</div>
+
+				<div class="settingsOption">
+					<span>Speed:</span>
+					<input type="number" id="speedInput" value="1" min="0.1" max="10" step="0.1">
+				</div>
+			</div>
+
 			<div id="closeSettings" class="button">Close</div>
 		</div>
 	`;
 	document.body.appendChild(menu);
+
+	setTimeout(() => menu.classList.add("show"), 10);
+
+	document.getElementById("closeSettings").onclick = () => {
+		menu.classList.remove("show");
+		setTimeout(() => menu.remove(), 500);
+	};
+}
 
 	// Delay to trigger transition
 	setTimeout(() => menu.classList.add("show"), 10);
