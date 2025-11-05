@@ -384,7 +384,7 @@ input{
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: rgba(0, 0, 0, 0.8);
+	background-color: rgba(0, 0, 0, 0.7); /* darker overlay */
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -400,37 +400,52 @@ input{
 }
 
 #settingsContent {
+	position: relative;
 	border: 1vmin solid white;
-	background-color: rgba(0, 0, 0, 0.5);
-	padding: 5vmin;
-	text-align: center;
+	background-color: rgba(0, 0, 0, 0.9); /* less transparent */
+	padding: 4vmin;
 	width: 70vw;
 	max-width: 800px;
-	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+	height: 60vh;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.6);
+	display: flex;
+	flex-direction: column;
 }
 
 #settingsTitle {
 	color: white;
-	font-size: 10vmin;
+	font-size: 8vmin;
 	text-shadow: 0 0 1vmin white;
-	margin-bottom: 4vmin;
+	margin: 0;
+	text-align: left;
+}
+
+#settingsOptions {
+	position: absolute;
+	top: 6vmin;
+	right: 5vmin;
+	text-align: right;
 }
 
 .settingsOption {
 	color: white;
 	font-family: "Press Start 2P", monospace;
-	font-size: 3vmin;
-	margin: 2vmin 0;
+	font-size: 2.5vmin;
+	margin: 1.5vmin 0;
 	text-shadow: 0 0 1vmin black;
 }
 
 #closeSettings {
-	position: static;
-	margin-top: 4vmin;
-	font-size: 6vmin !important;
+	position: absolute;
+	bottom: 4vmin;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 5vmin !important;
 	width: auto;
 	display: inline-block;
+	background-color: rgba(255, 255, 255, 0.05);
 }
+
 
 
 .label{
