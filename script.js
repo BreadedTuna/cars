@@ -1350,17 +1350,6 @@ function startSettings() {
 	};
 }
 
-	// Delay to trigger transition
-	setTimeout(() => menu.classList.add("show"), 10);
-
-	// Close on button click
-	document.getElementById("closeSettings").onclick = () => {
-		menu.classList.remove("show");
-		setTimeout(() => menu.remove(), 500);
-	};
-}
-
-
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
 		left = true;
