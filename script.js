@@ -1309,18 +1309,8 @@ function startSettings() {
 	menu.id = "settingsMenu";
 	menu.innerHTML = `
 		<div id="settingsContent">
-			<div id="settingsHeader">
-				<span id="settingsTitle">Settings</span>
-				<span id="closeSettings" class="closeBtn">✖</span>
-			</div>
-
-			<div id="settingsContent">
-	<div id="settingsHeader">
-		<span id="settingsTitle">Settings</span>
-		<span id="closeSettings" class="closeBtn">✖</span>
-	</div>
-
-	<div id="settingsOptions">
+			<div id="settingsOptions">
+				<div class="settingsOption">
 					<span>Private Game:</span>
 					<label class="toggle">
 						<input type="checkbox" id="privateToggle">
@@ -1346,6 +1336,8 @@ function startSettings() {
 					<input type="number" id="speedInput" value="1" min="0.1" max="10" step="0.1">
 				</div>
 			</div>
+
+			<div id="closeSettings" class="button">Close</div>
 		</div>
 	`;
 	document.body.appendChild(menu);
