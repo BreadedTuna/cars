@@ -378,6 +378,61 @@ input{
 	
 }
 
+#settingsMenu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.8);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.5s;
+	z-index: 1000000;
+}
+
+#settingsMenu.show {
+	opacity: 1;
+	pointer-events: all;
+}
+
+#settingsContent {
+	border: 1vmin solid white;
+	background-color: rgba(0, 0, 0, 0.5);
+	padding: 5vmin;
+	text-align: center;
+	width: 70vw;
+	max-width: 800px;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+}
+
+#settingsTitle {
+	color: white;
+	font-size: 10vmin;
+	text-shadow: 0 0 1vmin white;
+	margin-bottom: 4vmin;
+}
+
+.settingsOption {
+	color: white;
+	font-family: "Press Start 2P", monospace;
+	font-size: 3vmin;
+	margin: 2vmin 0;
+	text-shadow: 0 0 1vmin black;
+}
+
+#closeSettings {
+	position: static;
+	margin-top: 4vmin;
+	font-size: 6vmin !important;
+	width: auto;
+	display: inline-block;
+}
+
+
 .label{
 	font-family: "Press Start 2P";
 	color: white;
