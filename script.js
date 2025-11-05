@@ -1306,6 +1306,10 @@ function startGame(){
 	database.ref(code + "/status").set(1);
 }
 
+function startSettings(){
+	alert("coming soon!")
+}
+
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
 		left = true;
