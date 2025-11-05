@@ -1302,9 +1302,34 @@ function startGame(){
 	database.ref(code + "/status").set(1);
 }
 
-function startSettings(){
-	alert("coming soon!")
+function startSettings() {
+	// If already open, don’t open another
+	if (document.getElementById("settingsMenu")) return;
+
+	// Create menu container
+	const menu = document.createElement("div");
+	menu.id = "settingsMenu";
+	menu.innerHTML = `
+		<div id="settingsContent">
+			<div id="settingsTitle" class="title">SETTINGS</div>
+			<div class="settingsOption">Map Theme: <span class="value">Classic</span></div>
+			<div class="settingsOption">Trees: <span class="value">Normal</span></div>
+			<div class="settingsOption">Lighting: <span class="value">Day</span></div>
+			<div id="closeSettings" class="button">Close</div>
+		</div>
+	`;
+	document.body.appendChild(menu);
+
+	// Delay to trigger transition
+	setTimeout(() => menu.classList.add("show"), 10);
+
+	// Close on button click
+	document.getElementById("closeSettings").onclick = () => {
+		menu.classList.remove("show");
+		setTimeout(() => menu.remove(), 500);
+	};
 }
+
 
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
