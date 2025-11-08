@@ -1308,35 +1308,75 @@ function startSettings() {
         return;
     }
 
-    // 1. Create the main panel
+    // --- Main Panel ---
     const panel = document.createElement('div');
     panel.id = 'settings-panel';
 
-    // 2. Create the title
-    const title = document.createElement('h2');
-    title.textContent = 'Host Settings';
-    panel.appendChild(title);
-
-    // 3. Create Speed Setting
+    // --- Speed Setting ---
     const speedItem = document.createElement('div');
     speedItem.className = 'settings-item';
     
     const speedLabel = document.createElement('label');
-    speedLabel.htmlFor = 'setting-speed';
-    speedLabel.textContent = 'Game Speed (100 = default)';
+    speedLabel.htmlFor = 'setting-speed-slider';
+    speedLabel.textContent = 'Game Speed (Default: 0.004)';
     speedItem.appendChild(speedLabel);
 
+    const speedGroup = document.createElement('div');
+    speedGroup.className = 'settings-speed-group';
+
+    const speedSlider = document.createElement('input');
+    speedSlider.type = 'range';
+    speedSlider.id = 'setting-speed-slider';
+    speedSlider.min = '0.001';
+    speedSlider.max = '0.025';
+    speedSlider.value = '0.004'; // Default
+    speedSlider.step = '0.001';
+    speedGroup.appendChild(speedSlider);
+
     const speedInput = document.createElement('input');
-    speedInput.type = 'range';
-    speedInput.id = 'setting-speed';
-    speedInput.min = '50';  // 50% speed
-    speedInput.max = '150'; // 150% speed
-    speedInput.value = '100'; // Default 100%
-    speedItem.appendChild(speedInput);
+    speedInput.type = 'number';
+    speedInput.id = 'setting-speed-input';
+    speedInput.className = 'settings-input-number';
+    speedInput.value = '0.004';
+    speedInput.step = '0.001';
+    speedInput.min = '0.001';
+    speedGroup.appendChild(speedInput);
     
+    speedItem.appendChild(speedGroup);
     panel.appendChild(speedItem);
 
-    // 4. Create Map Data Setting
+    // --- Sync the slider and number input ---
+    speedSlider.oninput = () => {
+        speedInput.value = speedSlider.value;
+    };
+    speedInput.oninput = () => {
+        // Only update slider if the value is within its range
+        if (speedInput.value >= speedSlider.min && speedInput.value <= speedSlider.max) {
+            speedSlider.value = speedInput.value;
+        }
+    };
+
+    // --- Laps Setting ---
+    const lapsItem = document.createElement('div');
+    lapsItem.className = 'settings-item';
+
+    const lapsLabel = document.createElement('label');
+    lapsLabel.htmlFor = 'setting-laps';
+    lapsLabel.textContent = 'Number of Laps';
+    lapsItem.appendChild(lapsLabel);
+
+    const lapsInput = document.createElement('input');
+    lapsInput.type = 'number';
+    lapsInput.id = 'setting-laps';
+    lapsInput.className = 'settings-input-number';
+    lapsInput.value = '3'; // Default laps
+    lapsInput.min = '1';
+    lapsInput.step = '1';
+    lapsItem.appendChild(lapsInput);
+    
+    panel.appendChild(lapsItem);
+
+    // --- Map Data Setting ---
     const mapItem = document.createElement('div');
     mapItem.className = 'settings-item';
 
@@ -1352,9 +1392,9 @@ function startSettings() {
     
     panel.appendChild(mapItem);
 
-    // 5. Create Cast Shadows Setting
+    // --- Cast Shadows Setting ---
     const shadowItem = document.createElement('div');
-    shadowItem.className = 'settings-item-inline'; // Use a different class for layout
+    shadowItem.className = 'settings-item-inline';
 
     const shadowLabel = document.createElement('label');
     shadowLabel.htmlFor = 'setting-shadows';
@@ -1369,7 +1409,60 @@ function startSettings() {
     
     panel.appendChild(shadowItem);
 
-    // 6. Create Save/Close Button
+    // --- "More Options" Button ---
+    const moreBtn = document.createElement('div');
+    moreBtn.id = 'settings-more-btn';
+    moreBtn.textContent = 'More Options...';
+    panel.appendChild(moreBtn);
+
+    // --- "More Options" Panel (Hidden) ---
+    const extraPanel = document.createElement('div');
+    extraPanel.id = 'settings-extra-panel';
+    extraPanel.style.display = 'none'; // Hidden by default
+
+    // Add your extra settings here
+    // Example: Mountain Distance
+    const mountainItem = document.createElement('div');
+    mountainItem.className = 'settings-item';
+    const mountainLabel = document.createElement('label');
+    mountainLabel.htmlFor = 'setting-mountain-dist';
+    mountainLabel.textContent = 'Mountain Distance';
+    mountainItem.appendChild(mountainLabel);
+    const mountainInput = document.createElement('input');
+    mountainInput.type = 'number';
+    mountainInput.id = 'setting-mountain-dist';
+    mountainInput.className = 'settings-input-number';
+    mountainInput.value = '1000'; // Example default
+    mountainInput.step = '100';
+    mountainItem.appendChild(mountainInput);
+    extraPanel.appendChild(mountainItem);
+
+    // Example: Out of Bounds Distance
+    const oobItem = document.createElement('div');
+    oobItem.className = 'settings-item';
+    const oobLabel = document.createElement('label');
+    oobLabel.htmlFor = 'setting-oob-dist';
+    oobLabel.textContent = 'Out of Bounds Distance';
+    oobItem.appendChild(oobLabel);
+    const oobInput = document.createElement('input');
+    oobInput.type = 'number';
+    oobInput.id = 'setting-oob-dist';
+    oobInput.className = 'settings-input-number';
+    oobInput.value = '500'; // Example default
+    oobInput.step = '50';
+    oobItem.appendChild(oobInput);
+    extraPanel.appendChild(oobItem);
+    
+    panel.appendChild(extraPanel);
+
+    // --- Toggle logic for "More Options" ---
+    moreBtn.onclick = () => {
+        const isHidden = extraPanel.style.display === 'none';
+        extraPanel.style.display = isHidden ? 'block' : 'none';
+        moreBtn.textContent = isHidden ? 'Less Options...' : 'More Options...';
+    };
+
+    // --- Save/Close Button ---
     const closeBtn = document.createElement('div');
     closeBtn.id = 'settings-close-btn';
     closeBtn.textContent = 'Save & Close';
@@ -1377,10 +1470,13 @@ function startSettings() {
     closeBtn.onclick = function() {
         // --- This is where you would save the settings! ---
         // Example:
-        // const currentSpeed = document.getElementById('setting-speed').value;
+        // const currentSpeed = document.getElementById('setting-speed-input').value;
+        // const currentLaps = document.getElementById('setting-laps').value;
         // const currentMap = document.getElementById('setting-mapdata').value;
         // const useShadows = document.getElementById('setting-shadows').checked;
-        
+        // const mountainDist = document.getElementById('setting-mountain-dist').value;
+        // const oobDist = document.getElementById('setting-oob-dist').value;
+
         // (You'll need to store these variables somewhere your game can read them)
 
         // Now, remove the panel from the screen
