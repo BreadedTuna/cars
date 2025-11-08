@@ -390,7 +390,7 @@ input{
 	width: 85vw;
 	max-width: 700px;
 	
-	background-color: rgba(0, 0, 0, 0.8); /* A bit darker to stand out */
+	background-color: rgba(0, 0, 0, 0.95); /* MODIFIED: Made more opaque */
 	border: 1vmin solid white;
 	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
 	padding: 4vmin;
@@ -439,9 +439,8 @@ input{
 	resize: vertical; /* Allow user to resize it up/down */
 }
 
-/* The speed slider */
-#setting-speed {
-	width: 95%;
+#setting-speed-slider { /* MODIFIED: ID changed from #setting-speed */
+	width: 70%; /* MODIFIED: Made smaller to fit next to the input */
 	cursor: pointer;
 }
 
@@ -461,8 +460,8 @@ input{
 	cursor: pointer;
 }
 
-/* The close button */
-#settings-close-btn {
+#settings-close-btn,
+#settings-more-btn { /* MODIFIED: Added #settings-more-btn */
 	display: inline-block;
 	color: white;
 	border: 1vmin solid white;
@@ -472,15 +471,58 @@ input{
 	padding: 2vmin;
 	transition: box-shadow .2s, transform .2s, -webkit-transform .2s;
 	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
-	margin-top: 4vmin;
+	margin-top: 3vmin; /* MODIFIED: Changed margin */
 	font-family: Monoton; /* Match other buttons */
+    margin-left: 1vmin; /* ADDED */
+    margin-right: 1vmin; /* ADDED */
 }
 
 /* Hover effect for the close button */
-#settings-close-btn:hover {
+#settings-close-btn:hover,
+#settings-more-btn:hover { /* MODIFIED: Added #settings-more-btn:hover */
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 	transform: scale(0.9);
 	-webkit-transform: scale(0.9);
+}
+
+/* --- ADD THIS NEW CODE TO THE END OF YOUR CSS --- */
+
+/* Wrapper to hold speed slider and number input together */
+.settings-speed-group {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2vmin;
+}
+
+/* Style for all the new number inputs */
+.settings-input-number {
+	background-color: rgba(0, 0, 0, 0.5);
+	outline: none;
+	border: 1vmin solid white;
+	font-size: 3vmin;
+	color: white;
+	padding: 1vmin;
+	width: 25%;
+	font-family: "Press Start 2P";
+	text-align: center;
+}
+
+/* Remove ugly default arrows from number inputs */
+.settings-input-number {
+	-moz-appearance: textfield;
+}
+.settings-input-number::-webkit-inner-spin-button,
+.settings-input-number::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* The hidden panel for extra options */
+#settings-extra-panel {
+	margin-top: 3vmin;
+	padding-top: 3vmin;
+	border-top: 1vmin dashed white; /* Dashed to show it's "extra" */
 }
 
 .label{
