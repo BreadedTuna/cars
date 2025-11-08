@@ -378,6 +378,111 @@ input{
 	
 }
 
+/* --- Add this to the end of your existing CSS --- */
+
+/* The main settings panel (modal) */
+#settings-panel {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	
+	width: 85vw;
+	max-width: 700px;
+	
+	background-color: rgba(0, 0, 0, 0.8); /* A bit darker to stand out */
+	border: 1vmin solid white;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+	padding: 4vmin;
+	z-index: 100001; /* On top of the settings button */
+	text-align: center;
+}
+
+/* Settings panel title */
+#settings-panel h2 {
+	font-family: Monoton;
+	color: white;
+	font-size: 8vmin;
+	text-shadow: 0 0 1vmin black;
+	margin: 0 0 4vmin 0; /* 0 top/left/right, 4vmin bottom */
+}
+
+/* A wrapper for each setting item */
+.settings-item {
+	margin-bottom: 3vmin;
+	width: 100%;
+}
+
+/* Labels for settings */
+.settings-item label,
+.settings-item-inline label {
+	font-family: "Press Start 2P";
+	color: white;
+	text-shadow: 0 0 1vmin black;
+	font-size: 3vmin;
+	display: block;
+	margin-bottom: 1.5vmin;
+	text-align: left;
+}
+
+/* The map data text area */
+#setting-mapdata {
+	background-color: rgba(0, 0, 0, 0.5);
+	outline: none;
+	border: 1vmin solid white;
+	font-size: 2.5vmin; /* Smaller font for a long string */
+	color: white;
+	padding: 1vmin;
+	width: 95%; /* A bit of padding */
+	height: 15vmin;
+	font-family: monospace; /* Good for code/data strings */
+	resize: vertical; /* Allow user to resize it up/down */
+}
+
+/* The speed slider */
+#setting-speed {
+	width: 95%;
+	cursor: pointer;
+}
+
+/* The wrapper for the checkbox */
+.settings-item-inline {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 2vmin;
+	margin-top: 4vmin;
+}
+
+/* Make the checkbox bigger and fit the style */
+#setting-shadows {
+	width: 4vmin;
+	height: 4vmin;
+	cursor: pointer;
+}
+
+/* The close button */
+#settings-close-btn {
+	display: inline-block;
+	color: white;
+	border: 1vmin solid white;
+	background-color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	font-size: 7vmin;
+	padding: 2vmin;
+	transition: box-shadow .2s, transform .2s, -webkit-transform .2s;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+	margin-top: 4vmin;
+	font-family: Monoton; /* Match other buttons */
+}
+
+/* Hover effect for the close button */
+#settings-close-btn:hover {
+	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
+	transform: scale(0.9);
+	-webkit-transform: scale(0.9);
+}
+
 .label{
 	font-family: "Press Start 2P";
 	color: white;
