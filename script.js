@@ -748,6 +748,27 @@ function loadMap(){
 	return document.getElementById("trackcode").innerText.trim().split("|")[4];
 }
 
+function refreshMap(newMapString) {
+    // 1. Delete all map objects in memory
+    if (window.currentMapObjects) {
+        window.currentMapObjects.forEach(obj => {
+            if (obj.destroy) obj.destroy(); // if the game has a destroy method
+            else if (obj.remove) obj.remove(); // fallback
+        });
+    }
+
+    // 2. Clear local map references
+    window.currentMapObjects = [];
+    window.localMapData = null; // clear local copy if it exists
+    window.currentMapString = newMapString; // optional for tracking
+
+    // 3. Load the new map fresh
+    loadMap(newMapString);
+
+    console.log("Map refreshed and old data cleared.");
+}
+
+
 function join(){
 	eval(loadMap());
 	
