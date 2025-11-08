@@ -1366,7 +1366,7 @@ function startSettings() {
     const mapItem = document.createElement('div');
     mapItem.className = 'settings-item';
     mapItem.innerHTML = `<label for="setting-mapdata">Map Data</label>
-                         <textarea id="setting-mapdata" placeholder="Paste your map data string here..."></textarea>`;
+                         <textarea id="setting-mapdata" placeholder="paste your map data here..."></textarea>`;
     basicPanel.appendChild(mapItem);
 
     // --- Cast Shadows Setting ---
