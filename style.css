@@ -380,6 +380,9 @@ input{
 
 /* --- Add this to the end of your existing CSS --- */
 
+/* --- REMOVE all old styles from #settings-panel to #settings-extra-panel --- */
+/* --- and REPLACE them with this entire block --- */
+
 /* The main settings panel (modal) */
 #settings-panel {
 	position: absolute;
@@ -387,42 +390,47 @@ input{
 	left: 50%;
 	transform: translate(-50%, -50%);
 	
-	width: 85vw;
-	max-width: 700px;
+	width: 90vw;
+	max-width: 600px; /* More rectangular */
+	max-height: 90vh; /* Prevents overflow */
+	overflow-y: auto; /* Adds scrollbar if needed */
 	
-	background-color: rgba(0, 0, 0, 0.95); /* MODIFIED: Made more opaque */
+	background-color: rgba(0, 0, 0, 0.95);
 	border: 1vmin solid white;
 	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
-	padding: 4vmin;
-	z-index: 100001; /* On top of the settings button */
-	text-align: center;
+	padding: 3vmin;
+	z-index: 100001;
+	
+	/* Use box-sizing for easier width calculations */
+	box-sizing: border-box; 
 }
 
-/* Settings panel title */
-#settings-panel h2 {
-	font-family: Monoton;
-	color: white;
-	font-size: 8vmin;
-	text-shadow: 0 0 1vmin black;
-	margin: 0 0 4vmin 0; /* 0 top/left/right, 4vmin bottom */
-}
-
-/* A wrapper for each setting item */
+/* Wrapper for each setting item */
 .settings-item {
-	margin-bottom: 3vmin;
+	margin-bottom: 2.5vmin;
 	width: 100%;
 }
+.settings-item-inline {
+	display: flex;
+	align-items: center;
+	gap: 2vmin;
+	margin-top: 3vmin;
+}
 
-/* Labels for settings */
+/* All setting labels */
 .settings-item label,
 .settings-item-inline label {
 	font-family: "Press Start 2P";
 	color: white;
 	text-shadow: 0 0 1vmin black;
-	font-size: 3vmin;
+	/* Clamped font size: min 12px, scales at 2vmin, max 16px */
+	font-size: clamp(12px, 2vmin, 16px);
 	display: block;
 	margin-bottom: 1.5vmin;
-	text-align: left;
+	text-align: left; /* Changed from center */
+}
+.settings-item-inline label {
+	margin-bottom: 0; /* Reset for inline */
 }
 
 /* The map data text area */
@@ -430,82 +438,45 @@ input{
 	background-color: rgba(0, 0, 0, 0.5);
 	outline: none;
 	border: 1vmin solid white;
-	font-size: 2.5vmin; /* Smaller font for a long string */
+	font-size: clamp(12px, 2vmin, 14px);
 	color: white;
 	padding: 1vmin;
-	width: 95%; /* A bit of padding */
+	width: 100%;
 	height: 15vmin;
-	font-family: monospace; /* Good for code/data strings */
-	resize: vertical; /* Allow user to resize it up/down */
+	font-family: monospace;
+	resize: vertical;
+	box-sizing: border-box; /* Added */
 }
 
-#setting-speed-slider { /* MODIFIED: ID changed from #setting-speed */
-	width: 70%; /* MODIFIED: Made smaller to fit next to the input */
-	cursor: pointer;
-}
-
-/* The wrapper for the checkbox */
-.settings-item-inline {
+/* Wrapper for speed slider and number input */
+.settings-input-group {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 2vmin;
-	margin-top: 4vmin;
-}
-
-/* Make the checkbox bigger and fit the style */
-#setting-shadows {
-	width: 4vmin;
-	height: 4vmin;
-	cursor: pointer;
-}
-
-#settings-close-btn,
-#settings-more-btn { /* MODIFIED: Added #settings-more-btn */
-	display: inline-block;
-	color: white;
-	border: 1vmin solid white;
-	background-color: rgba(0, 0, 0, 0.5);
-	cursor: pointer;
-	font-size: 7vmin;
-	padding: 2vmin;
-	transition: box-shadow .2s, transform .2s, -webkit-transform .2s;
-	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
-	margin-top: 3vmin; /* MODIFIED: Changed margin */
-	font-family: Monoton; /* Match other buttons */
-    margin-left: 1vmin; /* ADDED */
-    margin-right: 1vmin; /* ADDED */
-}
-
-/* Hover effect for the close button */
-#settings-close-btn:hover,
-#settings-more-btn:hover { /* MODIFIED: Added #settings-more-btn:hover */
-	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
-	transform: scale(0.9);
-	-webkit-transform: scale(0.9);
-}
-
-/* --- ADD THIS NEW CODE TO THE END OF YOUR CSS --- */
-
-/* Wrapper to hold speed slider and number input together */
-.settings-speed-group {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
 	gap: 2vmin;
 }
 
-/* Style for all the new number inputs */
+/* The speed slider */
+#setting-speed-slider {
+	width: 75%; /* Slider takes up most of the space */
+	cursor: pointer;
+}
+
+/* Style for all the number inputs */
 .settings-input-number {
 	background-color: rgba(0, 0, 0, 0.5);
 	outline: none;
 	border: 1vmin solid white;
-	font-size: 3vmin;
+	font-size: clamp(14px, 2.5vmin, 18px);
 	color: white;
 	padding: 1vmin;
-	width: 25%;
+	width: 25%; /* Input takes up remaining space */
 	font-family: "Press Start 2P";
 	text-align: center;
+	box-sizing: border-box; /* Added */
+}
+/* Individual width for laps input */
+#setting-laps {
+	width: 100px;
 }
 
 /* Remove ugly default arrows from number inputs */
@@ -518,11 +489,68 @@ input{
 	margin: 0;
 }
 
-/* The hidden panel for extra options */
-#settings-extra-panel {
+/* --- NEW: The real-time speed indicator text --- */
+#setting-speed-output {
+	display: block;
+	font-family: "Press Start 2P";
+	color: #ccc; /* Slightly muted white */
+	font-size: clamp(12px, 2vmin, 14px);
+	text-align: center;
+	margin-top: 1vmin;
+}
+
+/* Make the checkbox bigger */
+#setting-shadows {
+	width: 3vmin;
+	height: 3vmin;
+	cursor: pointer;
+}
+
+/* --- NEW: Navigation footer for buttons --- */
+#settings-nav {
+	display: flex;
+	justify-content: space-between; /* Puts buttons on opposite ends */
+	align-items: center;
 	margin-top: 3vmin;
 	padding-top: 3vmin;
-	border-top: 1vmin dashed white; /* Dashed to show it's "extra" */
+	border-top: 1vmin solid white;
+}
+
+/* The main 'Save' button */
+#settings-close-btn {
+	color: white;
+	border: 1vmin solid white;
+	background-color: rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+	/* Clamped font size */
+	font-size: clamp(16px, 4vmin, 22px);
+	padding: 1.5vmin 2vmin;
+	transition: box-shadow .2s, transform .2s, -webkit-transform .2s;
+	box-shadow: 0 1vmin 2vmin rgba(0, 0, 0, 0.5);
+	font-family: Monoton;
+}
+#settings-close-btn:hover {
+	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
+	transform: scale(0.95);
+	-webkit-transform: scale(0.95);
+}
+
+/* --- NEW: Secondary button style ("More/Less") --- */
+.settings-btn-secondary {
+	font-family: "Press Start 2P";
+	color: #6eb0ea; /* Use a theme color */
+	font-size: clamp(12px, 2vmin, 14px);
+	cursor: pointer;
+	text-decoration: underline;
+}
+.settings-btn-secondary:hover {
+	color: white;
+}
+
+/* Style for the "Back" button in the advanced panel */
+#settings-less-btn {
+	margin-bottom: 3vmin;
+	font-weight: bold;
 }
 
 .label{
