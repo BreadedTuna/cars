@@ -1303,9 +1303,94 @@ function startGame(){
 }
 
 function startSettings() {
-	alert("coming soon!")
-}
+    // Prevent opening multiple menus
+    if (document.getElementById('settings-panel')) {
+        return;
+    }
 
+    // 1. Create the main panel
+    const panel = document.createElement('div');
+    panel.id = 'settings-panel';
+
+    // 2. Create the title
+    const title = document.createElement('h2');
+    title.textContent = 'Host Settings';
+    panel.appendChild(title);
+
+    // 3. Create Speed Setting
+    const speedItem = document.createElement('div');
+    speedItem.className = 'settings-item';
+    
+    const speedLabel = document.createElement('label');
+    speedLabel.htmlFor = 'setting-speed';
+    speedLabel.textContent = 'Game Speed (100 = default)';
+    speedItem.appendChild(speedLabel);
+
+    const speedInput = document.createElement('input');
+    speedInput.type = 'range';
+    speedInput.id = 'setting-speed';
+    speedInput.min = '50';  // 50% speed
+    speedInput.max = '150'; // 150% speed
+    speedInput.value = '100'; // Default 100%
+    speedItem.appendChild(speedInput);
+    
+    panel.appendChild(speedItem);
+
+    // 4. Create Map Data Setting
+    const mapItem = document.createElement('div');
+    mapItem.className = 'settings-item';
+
+    const mapLabel = document.createElement('label');
+    mapLabel.htmlFor = 'setting-mapdata';
+    mapLabel.textContent = 'Map Data';
+    mapItem.appendChild(mapLabel);
+
+    const mapInput = document.createElement('textarea');
+    mapInput.id = 'setting-mapdata';
+    mapInput.placeholder = 'Paste your map data string here...';
+    mapItem.appendChild(mapInput);
+    
+    panel.appendChild(mapItem);
+
+    // 5. Create Cast Shadows Setting
+    const shadowItem = document.createElement('div');
+    shadowItem.className = 'settings-item-inline'; // Use a different class for layout
+
+    const shadowLabel = document.createElement('label');
+    shadowLabel.htmlFor = 'setting-shadows';
+    shadowLabel.textContent = 'Cast Shadows:';
+    shadowItem.appendChild(shadowLabel);
+
+    const shadowInput = document.createElement('input');
+    shadowInput.type = 'checkbox';
+    shadowInput.id = 'setting-shadows';
+    shadowInput.checked = true; // Default to on
+    shadowItem.appendChild(shadowInput);
+    
+    panel.appendChild(shadowItem);
+
+    // 6. Create Save/Close Button
+    const closeBtn = document.createElement('div');
+    closeBtn.id = 'settings-close-btn';
+    closeBtn.textContent = 'Save & Close';
+    
+    closeBtn.onclick = function() {
+        // --- This is where you would save the settings! ---
+        // Example:
+        // const currentSpeed = document.getElementById('setting-speed').value;
+        // const currentMap = document.getElementById('setting-mapdata').value;
+        // const useShadows = document.getElementById('setting-shadows').checked;
+        
+        // (You'll need to store these variables somewhere your game can read them)
+
+        // Now, remove the panel from the screen
+        panel.remove();
+    };
+    panel.appendChild(closeBtn);
+
+    // 7. Add the completed panel to the game
+    document.body.appendChild(panel);
+}
 
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
