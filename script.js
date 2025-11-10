@@ -290,7 +290,7 @@ menu2 = function(){
 	VR = document.getElementById("cardboard").className == "tools sel";
 	f.style.transform = "translate3d(0, -100vh, 0)";
 	setTimeout(function(){
-		f.innerHTML = "<div class='menuitem title button' id='host' ontouchstart='this.click()' onclick='host()'>Host a game</div><div class='menuitem title button' ontouchstart='this.click()' id='join' onclick='joinGame()'>Join a game</div>";
+		f.innerHTML = "<div class='menuitem title button' id='host' ontouchstart='this.click()' onclick='host()'>Host a game</div><div class='menuitem title button' ontouchstart='this.click()' id='join' onclick='joinGame()'>Join a game</div><div class='menuitem title button' ontouchstart='this.click()' id='hostsettings' onclick='hostsettings()'>Host settings</div";
 		f.style.transform = "none";
 		setTimeout(function(){
 			document.getElementById("host").style.transform = "none";
@@ -312,7 +312,7 @@ host = function(){
 	document.getElementById("host").onclick = null;
 	f.style.transform = "translate3d(0, -100vh, 0)";
 	setTimeout(function(){
-		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div><div id='startsettings' class='title' onclick='startSettings();' ontouchstart='this.click()'>Settings</div>";
+		f.innerHTML = "<div class='info title'>Use this code to join the game!<div id='code'>Loading...</div></div><div id='startgame' class='title' onclick='startGame();' ontouchstart='this.click()'>Start!</div><div id='startsettings' class='title' onclick='startMenu();' ontouchstart='this.click()'>Settings</div>";
 		if(VR)
 			f.innerHTML += "<div id='divider'></div>";
 		f.appendChild(element);
@@ -1323,175 +1323,14 @@ function startGame(){
 	database.ref(code + "/status").set(1);
 }
 
-function startSettings() {
-    // Prevent opening multiple menus
-    if (document.getElementById('settings-panel')) {
-        return;
+function startMenu() {
+	alert("in development 🤫🤫🤫")
     }
 
-    // --- Main Panel ---
-    const panel = document.createElement('div');
-    panel.id = 'settings-panel';
+	function hostsettings() {
+		alert("coming soon 🤫🤫🤫")
+    }
 
-    // 1. =========================================
-    //    BASIC SETTINGS CONTAINER (Visible by default)
-    //    =========================================
-    const basicPanel = document.createElement('div');
-    basicPanel.id = 'settings-basic';
-
-    // --- Speed Setting ---
-    const speedItem = document.createElement('div');
-    speedItem.className = 'settings-item';
-    
-    speedItem.innerHTML = `<label for="setting-speed-slider">Game Speed (Default: 0.004)</label>`;
-    
-    const speedGroup = document.createElement('div');
-    speedGroup.className = 'settings-input-group';
-
-    const speedSlider = document.createElement('input');
-    speedSlider.type = 'range';
-    speedSlider.id = 'setting-speed-slider';
-    speedSlider.min = '0.001';
-    speedSlider.max = '0.025';
-    speedSlider.value = '0.004';
-    speedSlider.step = '0.001';
-    
-    const speedInput = document.createElement('input');
-    speedInput.type = 'number';
-    speedInput.id = 'setting-speed-input';
-    speedInput.className = 'settings-input-number';
-    speedInput.value = '0.004';
-    speedInput.step = '0.001';
-    speedInput.min = '0.001';
-
-    speedGroup.appendChild(speedSlider);
-    speedGroup.appendChild(speedInput);
-    speedItem.appendChild(speedGroup);
-
-    // --- Speed Text Indicator ---
-    const speedOutput = document.createElement('span');
-    speedOutput.id = 'setting-speed-output';
-    speedOutput.textContent = speedSlider.value; // Set initial value
-    speedItem.appendChild(speedOutput);
-
-    basicPanel.appendChild(speedItem);
-
-    // --- Laps Setting ---
-    const lapsItem = document.createElement('div');
-    lapsItem.className = 'settings-item';
-    lapsItem.innerHTML = `<label for="setting-laps">Number of Laps</label>
-                          <input type="number" id="setting-laps" class="settings-input-number" value="3" min="1" step="1">`;
-    basicPanel.appendChild(lapsItem);
-
-    // --- Map Data Setting ---
-    const mapItem = document.createElement('div');
-    mapItem.className = 'settings-item';
-    mapItem.innerHTML = `<label for="setting-mapdata">Map Data</label>
-                         <textarea id="setting-mapdata" placeholder="paste your map data here..."></textarea>`;
-    basicPanel.appendChild(mapItem);
-
-    // --- Cast Shadows Setting ---
-    const shadowItem = document.createElement('div');
-    shadowItem.className = 'settings-item-inline';
-    shadowItem.innerHTML = `<label for="setting-shadows">Cast Shadows:</label>
-                            <input type="checkbox" id="setting-shadows" checked>`;
-    basicPanel.appendChild(shadowItem);
-
-    panel.appendChild(basicPanel); // Add basic panel to main
-
-    // 2. =========================================
-    //    ADVANCED SETTINGS CONTAINER (Hidden)
-    //    =========================================
-    const advancedPanel = document.createElement('div');
-    advancedPanel.id = 'settings-advanced';
-    advancedPanel.style.display = 'none'; // Hide by default
-
-    // --- "Less Options" Button (inside advanced) ---
-    const lessBtn = document.createElement('div');
-    lessBtn.id = 'settings-less-btn';
-    lessBtn.className = 'settings-btn-secondary';
-    lessBtn.textContent = '< Back to Basic Settings';
-    advancedPanel.appendChild(lessBtn);
-
-    // --- Mountain Distance ---
-    const mountainItem = document.createElement('div');
-    mountainItem.className = 'settings-item';
-    mountainItem.innerHTML = `<label for="setting-mountain-dist">Mountain Distance</label>
-                              <input type="number" id="setting-mountain-dist" class="settings-input-number" value="1000" step="100">`;
-    advancedPanel.appendChild(mountainItem);
-
-    // --- Out of Bounds Distance ---
-    const oobItem = document.createElement('div');
-    oobItem.className = 'settings-item';
-    oobItem.innerHTML = `<label for="setting-oob-dist">Out of Bounds Distance</label>
-                         <input type="number" id="setting-oob-dist" class="settings-input-number" value="500" step="50">`;
-    advancedPanel.appendChild(oobItem);
-    
-    panel.appendChild(advancedPanel); // Add advanced panel to main
-
-    // 3. =========================================
-    //    NAVIGATION FOOTER (Buttons)
-    //    =========================================
-    const navFooter = document.createElement('div');
-    navFooter.id = 'settings-nav';
-
-    // --- "More Options" Button ---
-    const moreBtn = document.createElement('div');
-    moreBtn.id = 'settings-more-btn';
-    moreBtn.className = 'settings-btn-secondary';
-    moreBtn.textContent = 'More Options...';
-    
-    // --- "Save & Close" Button ---
-    const closeBtn = document.createElement('div');
-    closeBtn.id = 'settings-close-btn';
-    closeBtn.textContent = 'Save & Close';
-    
-    navFooter.appendChild(moreBtn);
-    navFooter.appendChild(closeBtn);
-    panel.appendChild(navFooter);
-
-    // 4. =========================================
-    //    EVENT LISTENERS
-    //    =========================================
-    
-    // --- Toggle Panels ---
-    moreBtn.onclick = () => {
-        basicPanel.style.display = 'none';
-        advancedPanel.style.display = 'block';
-        navFooter.style.display = 'none'; // Hide footer in advanced
-    };
-    lessBtn.onclick = () => {
-        basicPanel.style.display = 'block';
-        advancedPanel.style.display = 'none';
-        navFooter.style.display = 'flex'; // Show footer again
-    };
-
-    // --- Sync Speed Slider, Input, and Text ---
-    const updateSpeed = (newValue) => {
-        speedSlider.value = newValue;
-        speedInput.value = newValue;
-        speedOutput.textContent = newValue;
-    };
-    speedSlider.oninput = () => updateSpeed(speedSlider.value);
-    speedInput.oninput = () => updateSpeed(speedInput.value);
-
-    // --- Save & Close Logic ---
-    closeBtn.onclick = function() {
-        // --- This is where you would save the settings! ---
-        // (Note: Values from the "advanced" panel will still exist,
-        // so you can grab them even if that panel isn't visible)
-        // const currentSpeed = document.getElementById('setting-speed-input').value;
-        // const currentLaps = document.getElementById('setting-laps').value;
-        // const mountainDist = document.getElementById('setting-mountain-dist').value;
-        
-        panel.remove();
-    };
-
-    // 5. =========================================
-    //    ADD TO BODY
-    //    =========================================
-    document.body.appendChild(panel);
-}
 
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
