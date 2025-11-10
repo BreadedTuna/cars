@@ -302,14 +302,17 @@ input{
 }
 
 #hostsettings {
-	top: calc(20vh - 8vmin); /* slightly above the Host a game button */
+	/* Positioned below Host a Game */
+	top: calc(40vh - 8vmin); /* Host is at 30vh - 8vmin, so this is 10vh lower */
+	
+	/* Entry animation */
 	-webkit-transform: translate3d(-100vw, 0, 0);
 	        transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
 
-	/* same style family as .button, but smaller */
+	/* Visual style – same family as .button, slightly smaller */
 	border: 1vmin solid white;
 	padding: 1.5vmin;
 	font-size: 7vmin !important;
@@ -321,6 +324,9 @@ input{
 	line-height: 7vmin;
 	cursor: pointer;
 	box-shadow: 0 1.5vmin 2.5vmin rgba(0, 0, 0, 0.5);
+
+	/* Ensures it sits cleanly between Host and Join on any screen */
+	z-index: 10;
 }
 
 #hostsettings:hover {
