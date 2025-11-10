@@ -264,48 +264,75 @@ updateColor = function(){
 }
 updateColor();
 
-menu2 = function(){
-	fadeIn(menuMusic)
-	if(mobile){
-		function reactOrientation(e){
-			var angle = screen.orientation.type == "portrait-primary" ? e.gamma : screen.orientation.type == "portrait-secondary" ? -e.gamma : screen.orientation.type == "landscape-primary" ? e.beta : screen.orientation.type == "landscape-secondary" ? -e.beta : 0;
+menu2 = function() {
+	fadeIn(menuMusic);
+
+	if (mobile) {
+		function reactOrientation(e) {
+			var angle = screen.orientation.type == "portrait-primary"
+				? e.gamma
+				: screen.orientation.type == "portrait-secondary"
+				? -e.gamma
+				: screen.orientation.type == "landscape-primary"
+				? e.beta
+				: screen.orientation.type == "landscape-secondary"
+				? -e.beta
+				: 0;
 			me.data.steer = Math.max(Math.min((-angle) / 180 * Math.PI, Math.PI / 6), -Math.PI / 6);
 		}
-		
-		if(DeviceOrientationEvent.requestPermission){
-			DeviceOrientationEvent.requestPermission("The game needs to access phone tilt so you can steer your car.").then(permissionState => {
-				if (permissionState === 'granted')
-					window.addEventListener('deviceorientation', reactOrientation);
-				else
-					alert("Permission denied");
-			}).catch(alert);
-    		}else{
+
+		if (DeviceOrientationEvent.requestPermission) {
+			DeviceOrientationEvent.requestPermission("The game needs to access phone tilt so you can steer your car.")
+				.then(permissionState => {
+					if (permissionState === 'granted')
+						window.addEventListener('deviceorientation', reactOrientation);
+					else
+						alert("Permission denied");
+				}).catch(alert);
+		} else {
 			window.addEventListener('deviceorientation', reactOrientation);
 		}
 	}
-	if(document.getElementById("name").value == "")
+
+	if (document.getElementById("name").value == "")
 		name = "Nerd with No Name";
 	else
 		name = document.getElementById("name").value;
+
 	VR = document.getElementById("cardboard").className == "tools sel";
+
 	f.style.transform = "translate3d(0, -100vh, 0)";
-	setTimeout(function(){
-		f.innerHTML = "<div class='menuitem title button' id='host' ontouchstart='this.click()' onclick='host()'>Host a game</div><div class='menuitem title button' ontouchstart='this.click()' id='join' onclick='joinGame()'>Join a game</div><div class='menuitem title button' ontouchstart='this.click()' id='hostsettings' onclick='hostsettings()'>Host settings</div>";
+	setTimeout(function() {
+		f.innerHTML = `
+			<div class='menuitem title button' id='hostsettings' ontouchstart='this.click()' onclick='hostsettings()'>Host settings</div>
+			<div class='menuitem title button' id='host' ontouchstart='this.click()' onclick='host()'>Host a game</div>
+			<div class='menuitem title button' id='join' ontouchstart='this.click()' onclick='joinGame()'>Join a game</div>
+		`;
 		f.style.transform = "none";
-		setTimeout(function(){
+
+		// Animate buttons in sequence
+		setTimeout(function() {
+			document.getElementById("hostsettings").style.transform = "none";
+			setTimeout(function() {
+				document.getElementById("hostsettings").style.transition = "transform .2s, box-shadow .2s";
+			}, 500);
+		}, 300);
+
+		setTimeout(function() {
 			document.getElementById("host").style.transform = "none";
-			setTimeout(function(){
+			setTimeout(function() {
 				document.getElementById("host").style.transition = "transform .2s, box-shadow .2s";
 			}, 500);
-		}, 500);
-		setTimeout(function(){
+		}, 600);
+
+		setTimeout(function() {
 			document.getElementById("join").style.transform = "none";
-			setTimeout(function(){
+			setTimeout(function() {
 				document.getElementById("join").style.transition = "transform .2s, box-shadow .2s";
 			}, 500);
-		}, 1000);
+		}, 900);
 	}, 500);
-}
+};
 
 host = function(){
 	fadeOut(menuMusic)
