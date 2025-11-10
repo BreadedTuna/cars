@@ -280,69 +280,66 @@ input{
 	        transform: scale(0.9) !important;
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
-
 #host{
 	top: calc(30vh - 8vmin);
 	-webkit-transform: translate3d(-100vw, 0, 0);
-	        transform: translate3d(-100vw, 0, 0);
+	        transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
-/* -webkit-transform-style: preserve-3d; */
-/* animation: slideleft 1s -0.5s ease-out forwards; */
+/* 	-webkit-transform-style: preserve-3d; */
+/* 	animation: slideleft 1s -0.5s ease-out forwards; */
 }
 #join{
-	/* Groups this button 2vmin below the 'Host Settings' button.
-	  #hostsettings top:     (30vh + 10vmin)
-	  #hostsettings height:  11vmin (7 line-height + 2*1.5 padding + 2*1 border)
-	  New top:               (30vh + 10vmin) + 11vmin + 2vmin gap = 30vh + 23vmin
-	*/
-	top: calc(30vh + 23vmin);
-	
-	/* Entry animation - delayed by 0.2s to follow the others */
+	top: calc(70vh - 8vmin);
 	-webkit-transform: translate3d(-100vw, 0, 0);
-	        transform: translate3d(-100vw, 0, 0);
+	        transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
-	transition-delay: 0.2s; /* This creates the waterfall effect */
+/* 	-webkit-transform-style: preserve-3d; */
+/* 	animation: slideleft 1s ease-out forwards; */
 }
 
 #hostsettings {
-	/* Groups this button 2vmin below the 'Host' button.
-	  #host top:     (30vh - 8vmin)
-	  #host height:  16vmin (10 line-height + 2*2 padding + 2*1 border)
-	  New top:       (30vh - 8vmin) + 16vmin + 2vmin gap = 30vh + 10vmin
+	/* --- THIS IS THE FIX ---
+	We calculate the top based on the bottom of the #host button.
+	#host top:     calc(30vh - 8vmin)
+	#host height:  16vmin (padding 2*2 + line-height 10 + border 1*2)
+	#host bottom:  (30vh - 8vmin) + 16vmin = 30vh + 8vmin
+	
+	We add a 2vmin gap for spacing.
+	New top = (30vh + 8vmin) + 2vmin = 30vh + 10vmin
 	*/
 	top: calc(30vh + 10vmin);
 	
-	/* Entry animation - delayed by 0.1s to follow #host */
+	/* Entry animation */
 	-webkit-transform: translate3d(-100vw, 0, 0);
 	        transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
-	transition-delay: 0.1s; /* This creates the waterfall effect */
 
-	/* Visual style */
+	/* Visual style – same family as .button, slightly smaller */
 	border: 1vmin solid white;
 	padding: 1.5vmin;
 	font-size: 7vmin !important;
 	background-color: rgba(0, 0, 0, 0.5);
 	position: absolute;
 	width: 60vmin;
-	/* Perfect centering: (60width + 2*1.5padding + 2*1border) / 2 = 32.5 */
-	left: calc(50vw - 32.5vmin);
+	left: calc(50vw - 31vmin); /* Centered (60vmin width + 2*1vmin border)/2 = 31vmin */
 	text-shadow: none;
 	line-height: 7vmin;
 	cursor: pointer;
 	box-shadow: 0 1.5vmin 2.5vmin rgba(0, 0, 0, 0.5);
+
+	/* Ensures it sits cleanly between Host and Join on any screen */
 	z-index: 10;
 }
 
 #hostsettings:hover {
 	-webkit-transform: scale(0.9) !important;
-	        transform: scale(0.9) !important;
+	        transform: scale(0.9) !important;
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
