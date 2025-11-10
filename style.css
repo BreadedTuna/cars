@@ -302,12 +302,20 @@ input{
 }
 
 #hostsettings {
-	/* Positioned below Host a Game */
-	top: calc(40vh - 8vmin); /* Host is at 30vh - 8vmin, so this is 10vh lower */
+	/* --- THIS IS THE FIX ---
+	We calculate the top based on the bottom of the #host button.
+	#host top:     calc(30vh - 8vmin)
+	#host height:  16vmin (padding 2*2 + line-height 10 + border 1*2)
+	#host bottom:  (30vh - 8vmin) + 16vmin = 30vh + 8vmin
+	
+	We add a 2vmin gap for spacing.
+	New top = (30vh + 8vmin) + 2vmin = 30vh + 10vmin
+	*/
+	top: calc(30vh + 10vmin);
 	
 	/* Entry animation */
 	-webkit-transform: translate3d(-100vw, 0, 0);
-	        transform: translate3d(-100vw, 0, 0);
+	        transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
@@ -319,7 +327,7 @@ input{
 	background-color: rgba(0, 0, 0, 0.5);
 	position: absolute;
 	width: 60vmin;
-	left: calc(50vw - 31vmin);
+	left: calc(50vw - 31vmin); /* Centered (60vmin width + 2*1vmin border)/2 = 31vmin */
 	text-shadow: none;
 	line-height: 7vmin;
 	cursor: pointer;
