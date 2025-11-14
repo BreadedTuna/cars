@@ -994,6 +994,42 @@ function join(){
 					if(play.data.lap > LAPS && document.getElementById("countdown").innerHTML == ""){
 						document.getElementById("countdown").style.fontSize = "25vmin";
 						document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
+
+						// --- ✅ NEW CODE STARTS HERE ---
+						
+						// Check if the button already exists to prevent creating it 60x/second
+						if (!document.getElementById("main-menu-btn")) {
+							
+							// 1. Create the button element, just like 'countDown'
+							var menuBtn = document.createElement("DIV");
+							
+							// 2. Set its ID so we can check for it
+							menuBtn.id = "main-menu-btn";
+							
+							// 3. Use the exact classes from your menu2() function for consistency
+							//    These are defined in actualmaingame.css
+							menuBtn.className = "menuitem title button"; 
+							
+							// 4. Set the button text
+							menuBtn.innerHTML = "Main Menu";
+							
+							// 5. Set the "sneaky refresh" action
+							menuBtn.onclick = function() {
+								window.location.reload(); 
+							};
+							
+							// 6. Add the touch-to-click attribute (good practice from your menu2())
+							menuBtn.setAttribute("ontouchstart", "this.click()");
+							
+							// 7. Apply the custom styles from your roadmap
+							//    The .button class is 80vmin wide, so we must adjust
+							//    the 'left' to center it
+							menuBtn.style.top = "70vh";
+							menuBtn.style.fontSize = "10vmin"; // Matches .button font size
+							
+							// 8. Add it to the foreground
+							f.appendChild(menuBtn);
+						}
 					}
 					
 					for(var pl in players){
