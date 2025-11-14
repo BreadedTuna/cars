@@ -1012,6 +1012,8 @@ function join(){
 							
 							// 4. Set the button text
 							menuBtn.innerHTML = "Main Menu";
+
+							menuBtn.style.zIndex = 100001;
 							
 							// 5. Set the "sneaky refresh" action
 							menuBtn.onclick = function() {
