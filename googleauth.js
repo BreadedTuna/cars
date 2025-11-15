@@ -41,21 +41,48 @@
     handleCodeInApp: true,
   };
 
-  /* -------- MAIN: Try Google login with robust fallback -------- */
+/* -------- MAIN: Try Google login with simplified logic -------- */
   function googleLoginWithFallback() {
     statusText.textContent = "Starting sign-in...";
-    // On iOS always use redirect (less fragile than popup)
-    if (isIOS()) {
-      log("iOS detected — using signInWithRedirect()");
+    const auth = firebase.auth();
+
+    // 1. iOS Check: Always use Redirect for mobile devices (most reliable)
+    if (isIOS() || window.innerWidth <= 768) { // Added a width check for general mobile devices
+      log("Mobile detected — using signInWithRedirect()");
       statusText.textContent = "Redirecting to Google sign-in...";
-      // We'll attempt redirect and rely on getRedirectResult on load to complete.
-      firebase.auth().signInWithRedirect(provider).catch(function (err) {
+      auth.signInWithRedirect(provider).catch(function (err) {
         log("Redirect failed:", err);
-        // If redirect fails (rare), fall back to email link
+        // If redirect fails (rarely), fall back to email link
         startEmailLinkFallback("Redirect failed: " + (err.message || err.code));
       });
       return;
     }
+
+    // 2. Desktop: Try Popup first
+    log("Desktop detected — trying signInWithPopup()");
+    auth.signInWithPopup(provider)
+      .then(function (result) {
+        // Success is handled by onAuthStateChanged, but we can log status here
+        log("Popup sign-in success:", result.user && result.user.email);
+      })
+      .catch(function (error) {
+        log("Popup sign-in error:", error);
+        
+        // If popup is blocked, try redirect as a fallback,
+        // but without aggressive timers.
+        if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+           statusText.textContent = "Popup blocked — trying redirect...";
+           auth.signInWithRedirect(provider).catch(function(redirectErr) {
+               log("Redirect fallback failed:", redirectErr);
+               startEmailLinkFallback("Redirect fallback failed after popup error.");
+           });
+           return;
+        }
+
+        // For all other errors (e.g., user cancellation), use Email Link as the last resort
+        startEmailLinkFallback("Login failed: " + (error.message || error.code));
+      });
+  }
 
     // Non-iOS: try popup first, but watch for popup-block or timeout
     let popupTimedOut = false;
@@ -218,19 +245,20 @@
     });
   })();
 
-  /* -------- Redirect result handler (if redirect used, finish flow) -------- */
+/* -------- Redirect result handler (if redirect used, finish flow) -------- */
   firebase.auth().getRedirectResult()
     .then(function (result) {
       if (result.user) {
         log("Redirect sign-in success:", result.user.email);
         statusText.textContent = "Signed in: " + result.user.email;
-      } else {
-        // no redirect result — nothing to do
+        // The rest of the authorization check is handled by onAuthStateChanged
       }
+      // CRITICAL: No else block here. If result.user is null, it just means the page loaded 
+      // without a redirect happening, which is normal.
     })
     .catch(function (error) {
       log("getRedirectResult error:", error);
-      // If redirect fails (e.g. blocked by policy), start email fallback so user can still sign in
+      // ONLY start email fallback if the redirect itself failed, not if it was empty.
       startEmailLinkFallback("getRedirectResult error: " + (error.message || error.code));
     });
 
