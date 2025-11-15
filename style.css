@@ -83,6 +83,12 @@ input{
     z-index: 100001;
 }
 
+#main-menu-btn:hover {
+    /* This rule combines both transforms and uses !important to win */
+    -webkit-transform: translateX(-50%) scale(0.9) !important;
+            transform: translateX(-50%) scale(0.9) !important;
+}
+
 #name{
 	background-color: rgba(0, 0, 0, 0.5);
 	outline: none;
