@@ -866,6 +866,13 @@ function join(){
 		requestAnimationFrame(render);
 		var timepassed = timestamp - lastTime;
 		lastTime = timestamp;
+
+		// fixed
+		if (timepassed > 250) {
+			timepassed = 250;
+		}
+		// --- END FIX ---
+
 		var warp = timepassed / 16;
 		
 		if(gameStarted){
