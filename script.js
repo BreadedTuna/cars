@@ -991,28 +991,16 @@ function join(){
 						}
 					}
 					
-					if(play.data.lap > LAPS && document.getElementById("countdown").innerHTML == ""){
-						document.getElementById("countdown").style.fontSize = "25vmin";
-						document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
-						// -----------------------------------------------------------------
-// 1. DELETE the old, broken 'if' block in your render() function.
-// -----------------------------------------------------------------
-
-// -----------------------------------------------------------------
-// 2. PASTE this entire new block in its place.
-// -----------------------------------------------------------------
-
-if (play.data.lap > LAPS && document.getElementById("countdown").innerHTML == "") {
+					if (play.data.lap > LAPS && document.getElementById("countdown").innerHTML == "") {
     document.getElementById("countdown").style.fontSize = "25vmin";
     document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
 
-    // Check if button exists (no nested 'if' here!)
+    // Check if button exists
     if (!document.getElementById("main-menu-btn")) {
 
         var menuBtn = document.createElement("DIV");
 
         menuBtn.id = "main-menu-btn";
-        // Use all the same classes as your other menu buttons for consistency
         menuBtn.className = "menuitem title button";
         menuBtn.innerHTML = "Main Menu";
 
@@ -1024,7 +1012,6 @@ if (play.data.lap > LAPS && document.getElementById("countdown").innerHTML == ""
         menuBtn.setAttribute("ontouchstart", "this.click()");
 
         // --- STYLES ARE ADDED DIRECTLY HERE ---
-        // This guarantees the button is visible, centered, and on top.
         menuBtn.style.position = "absolute";
         menuBtn.style.top = "70vh";
         menuBtn.style.left = "50%";
