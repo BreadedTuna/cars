@@ -1386,6 +1386,10 @@ function startMenu() {
 		alert("coming soon 🤫🤫🤫")
     }
 
+	function refreshgame() {
+    window.location.reload(); 
+}
+
 
 window.onkeydown = function(e){
 	if(e.keyCode == 37)
