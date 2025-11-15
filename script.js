@@ -1003,20 +1003,30 @@ function join(){
         menuBtn.id = "main-menu-btn";
         menuBtn.className = "menuitem title button";
         menuBtn.innerHTML = "Main Menu";
-
-        // Call your refreshgame() function
         menuBtn.onclick = function() {
             refreshgame();
         };
-
         menuBtn.setAttribute("ontouchstart", "this.click()");
 
-        // --- STYLES ARE ADDED DIRECTLY HERE ---
+        // --- POSITION & SLIDE-IN FIX ---
+        // This sets the button's final position immediately,
+        // overriding the 'menuitem' slide-in animation.
         menuBtn.style.position = "absolute";
         menuBtn.style.top = "70vh";
         menuBtn.style.left = "50%";
-        menuBtn.style.transform = "translateX(-50%)"; // This centers it
-        menuBtn.style.zIndex = "100001"; // Places it on top of the "Won!" text
+        menuBtn.style.transform = "translateX(-50%)"; // Center it
+        menuBtn.style.zIndex = "100001";
+        
+        // --- HOVER FIX ---
+        // We apply the hover effect manually to combine scaling AND centering.
+        menuBtn.onmouseover = function() {
+            // Combine the centering with the scaling
+            this.style.transform = "translateX(-50%) scale(0.9)";
+        };
+        menuBtn.onmouseout = function() {
+            // Return to just being centered
+            this.style.transform = "translateX(-50%) scale(1)";
+        };
 
         // Add the button to the screen
         f.appendChild(menuBtn);
