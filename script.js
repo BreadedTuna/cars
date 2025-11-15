@@ -994,36 +994,48 @@ function join(){
 					if(play.data.lap > LAPS && document.getElementById("countdown").innerHTML == ""){
 						document.getElementById("countdown").style.fontSize = "25vmin";
 						document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
+						// -----------------------------------------------------------------
+// 1. DELETE the old, broken 'if' block in your render() function.
+// -----------------------------------------------------------------
 
-						// --- ✅ NEW CODE STARTS HERE ---
-if(play.data.lap > LAPS && document.getElementById("countdown").innerHTML == ""){
-						document.getElementById("countdown").style.fontSize = "25vmin";
-						document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
+// -----------------------------------------------------------------
+// 2. PASTE this entire new block in its place.
+// -----------------------------------------------------------------
 
-						// --- ✅ UPDATED CODE STARTS HERE ---
-						
-						if (!document.getElementById("main-menu-btn")) {
-							
-							var menuBtn = document.createElement("DIV");
-							
-							menuBtn.id = "main-menu-btn";
-							menuBtn.className = "menuitem title button"; 
-							menuBtn.innerHTML = "Main Menu";
-							
-							// 1. CHANGE: Now calls your new function
-							menuBtn.onclick = function() {
-								refreshgame(); 
-							};
-							
-							// 2. CHANGE: Removed all inline styles (position, z-index, top, etc.)
-							//    We now rely on the #main-menu-btn CSS block above.
-							menuBtn.setAttribute("ontouchstart", "this.click()");
-							
-							f.appendChild(menuBtn);
-						}
-						// --- ✅ UPDATED CODE ENDS HERE ---
-					}
-					}
+if (play.data.lap > LAPS && document.getElementById("countdown").innerHTML == "") {
+    document.getElementById("countdown").style.fontSize = "25vmin";
+    document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
+
+    // Check if button exists (no nested 'if' here!)
+    if (!document.getElementById("main-menu-btn")) {
+
+        var menuBtn = document.createElement("DIV");
+
+        menuBtn.id = "main-menu-btn";
+        // Use all the same classes as your other menu buttons for consistency
+        menuBtn.className = "menuitem title button";
+        menuBtn.innerHTML = "Main Menu";
+
+        // Call your refreshgame() function
+        menuBtn.onclick = function() {
+            refreshgame();
+        };
+
+        menuBtn.setAttribute("ontouchstart", "this.click()");
+
+        // --- STYLES ARE ADDED DIRECTLY HERE ---
+        // This guarantees the button is visible, centered, and on top.
+        menuBtn.style.position = "absolute";
+        menuBtn.style.top = "70vh";
+        menuBtn.style.left = "50%";
+        menuBtn.style.transform = "translateX(-50%)"; // This centers it
+        menuBtn.style.zIndex = "100001"; // Places it on top of the "Won!" text
+
+        // Add the button to the screen
+        f.appendChild(menuBtn);
+    }
+}
+					
 					
 					for(var pl in players){
 						if(play != players[pl] && play.model.position.distanceTo(players[pl].model.position) < 2){
