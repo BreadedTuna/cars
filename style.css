@@ -364,6 +364,173 @@ input{
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
+/* --- Lobby Setup Modal Styles (Replacing Host Settings) --- */
+#host-settings-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 95%;
+    max-width: 650px; /* Wider to accommodate map selection */
+    max-height: 90vh;
+    overflow-y: auto;
+    background-color: rgba(10, 10, 10, 0.95); /* Very dark background */
+    border: 3px solid #00FFFF; /* Cyan border for an editor/tech look */
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+    z-index: 200000;
+    color: white;
+    text-align: left;
+    display: none; 
+    transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+    opacity: 0;
+}
+
+#host-settings-modal.active {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#host-settings-modal h2 {
+    text-align: center;
+    font-family: Monoton;
+    font-size: 6vmin;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px #00FFFF;
+    color: #00FFFF;
+}
+
+#host-settings-modal h3 {
+    color: #00FFFF;
+    font-size: 3vmin;
+    border-bottom: 2px solid #00FFFF;
+    padding-bottom: 5px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+/* Settings Groups */
+.setting-group {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px dashed #444;
+    border-radius: 5px;
+}
+
+/* Map Options */
+#map-options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.map-option {
+    width: 150px;
+    height: 150px;
+    background-color: #222;
+    border: 3px solid #444;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease-in-out;
+}
+
+.map-option:hover {
+    border-color: #00FFFF;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.map-option.selected {
+    border-color: #FF00FF; /* Highlight selected map with Magenta */
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+    background-color: #331133;
+    transform: scale(1.05);
+}
+
+.map-icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.map-name {
+    font-size: 2vmin;
+    font-weight: bold;
+    display: block;
+}
+
+#map-description {
+    font-size: 2vmin;
+    color: #ccc;
+    text-align: center;
+    margin-top: 10px;
+    padding: 5px 0;
+}
+
+/* Settings Inputs */
+.setting-item {
+    margin: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-item label {
+    font-size: 2.5vmin;
+    font-weight: bold;
+    color: white;
+}
+
+#host-settings-modal input[type="number"], 
+#host-settings-modal textarea {
+    background-color: #111;
+    color: #00FF00; /* Green text for a terminal feel */
+    border: 1px solid #00FF00;
+    padding: 8px;
+    font-size: 2.5vmin;
+    width: 150px;
+    box-sizing: border-box;
+    border-radius: 0;
+    font-family: monospace;
+}
+
+#host-settings-modal textarea {
+    width: 100%;
+    height: 120px;
+    resize: vertical;
+    margin-top: 5px;
+}
+
+.modal-buttons {
+    margin-top: 35px;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Ensure the menuitem button style is used for modal buttons */
+.modal-buttons .menuitem {
+    cursor: pointer;
+    width: 45%;
+    height: auto;
+    padding: 15px;
+    text-align: center;
+    font-size: 3vmin;
+    background-color: #004444;
+    border: 2px solid #00FFFF;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.modal-buttons .menuitem:hover {
+    background-color: #007777;
+}
+
 .info{
 	position: absolute;
 	top: 0;
