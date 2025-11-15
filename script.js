@@ -1415,15 +1415,22 @@ function startMenu() {
     }
 
 	// Function to start the Custom Host flow (called by the "Custom Host" menu button)
+// --- Modal Visibility Handlers ---
+
+// Function to start the Custom Host flow (called by the "Custom Host" menu button)
 function hostsettings() {
     createSettingsModal();
-    document.getElementById("host-settings-modal").classList.add("active");
+    // Show the modal by setting the active class on the container
+    document.getElementById("host-settings-modal-container").classList.add("active");
 }
 
 // Helper to close the modal
 function closeSettingsModal() {
-    document.getElementById("host-settings-modal").classList.remove("active");
+    // Hide the modal by removing the active class
+    document.getElementById("host-settings-modal-container").classList.remove("active");
 }
+
+// --- Settings/Map Logic ---
 
 // Handler for map selection buttons
 function selectMap(mapId) {
@@ -1455,7 +1462,7 @@ function updateSettingsInputs() {
 // Function to create the modal HTML structure
 function createSettingsModal() {
     // If the modal exists, just ensure it's up-to-date and return
-    if (document.getElementById("host-settings-modal")) {
+    if (document.getElementById("host-settings-modal-container")) {
         updateSettingsInputs();
         return;
     }
@@ -1467,10 +1474,15 @@ function createSettingsModal() {
         </div>
     `).join('');
     
-    var modal = document.createElement("DIV");
-    modal.id = "host-settings-modal";
+    // Create the container element (for the slide-in animation)
+    var container = document.createElement("DIV");
+    container.id = "host-settings-modal-container";
+
+    // Create the menu element (the actual content panel)
+    var menu = document.createElement("DIV");
+    menu.id = "host-settings-menu";
     
-    modal.innerHTML = `
+    menu.innerHTML = `
         <h2>Lobby Setup</h2>
 
         <div class="setting-group">
@@ -1488,7 +1500,7 @@ function createSettingsModal() {
                 <input type="number" id="laps-input" value="${LAPS}" min="1" max="99">
             </div>
             <div class="setting-item">
-                <label for="speed-input">Base Speed</label>
+                <label for="speed-input">Base Speed (SPEED)</label>
                 <input type="number" id="speed-input" value="${SPEED}" step="0.001" min="0.001" max="0.01">
             </div>
             <div class="setting-item">
@@ -1503,15 +1515,23 @@ function createSettingsModal() {
         </div>
 
         <div class="modal-buttons">
-            <div class="menuitem button" onclick="applySettings()">Start Custom Game</div>
-            <div class="menuitem button" onclick="closeSettingsModal()">Cancel</div>
+            <div class="button" onclick="closeSettingsModal()">Cancel</div>
+            <div class="button" onclick="applySettings()">Start Custom Game</div>
         </div>
     `;
     
-    document.body.appendChild(modal);
+    container.appendChild(menu);
+    document.body.appendChild(container);
 
     // Initial call to ensure settings inputs match the default selected map
     updateSettingsInputs();
+}
+
+// NOTE: You still need to implement the actual hosting logic in `applySettings()` 
+// and create the `quickHostGame()` function to complete the two-button flow!
+function applySettings() {
+    alert("Apply settings logic needs to be implemented to host the game.");
+    // This is where you will read inputs, check for custom map code, and call hostGame(...)
 }
 
 // Note: You still need to implement the 'applySettings' and 'quickHostGame' 
