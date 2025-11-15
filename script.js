@@ -8,6 +8,31 @@ var BOUNCE_CORRECT = 0.01;
 var WALL_SIZE = 1.2;
 var MOUNTAIN_DIST = 250;
 var OOB_DIST = 200;
+const PRESET_MAPS = [
+    {
+        id: 'default_track', // Used internally
+        name: 'The Starter Loop',
+        description: 'A simple, classic 3-lap oval with low bounce. The perfect starting grid.',
+        icon: '🏁', 
+        map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}]', // Example Map Code
+        default_laps: 3,
+        default_speed: 0.004,
+        default_bounce: 0.7
+    },
+    {
+        id: 'city_circuit',
+        name: 'City Circuit Night Run',
+        description: 'A technical circuit with tight turns and high walls. Requires precision.',
+        icon: '🌃',
+        map_code: 'walls=[{"x1":-10,"z1":-30,"x2":10,"z2":-30}, {"x1":-10,"z1":-30,"x2":-10,"z2":30}, {"x1":-10,"z1":30,"x2":10,"z2":30}, {"x1":10,"z1":30,"x2":10,"z2":-30}]', // Example Map Code
+        default_laps: 5,
+        default_speed: 0.003,
+        default_bounce: 0.85
+    }
+    // Add more maps here as needed!
+];
+
+var selectedMap = PRESET_MAPS[0];
 var LAPS = 3;
 
 // --- Menu music setup ---
@@ -1387,9 +1412,108 @@ function startMenu() {
 	alert("in development 🤫🤫🤫")
     }
 
-	function hostsettings() {
-		alert("coming soon 🤫🤫🤫")
+	// Function to start the Custom Host flow (called by the "Custom Host" menu button)
+function hostsettings() {
+    createSettingsModal();
+    document.getElementById("host-settings-modal").classList.add("active");
+}
+
+// Helper to close the modal
+function closeSettingsModal() {
+    document.getElementById("host-settings-modal").classList.remove("active");
+}
+
+// Handler for map selection buttons
+function selectMap(mapId) {
+    selectedMap = PRESET_MAPS.find(m => m.id === mapId);
+    updateSettingsInputs();
+}
+
+// Function to update the settings inputs when a new map is selected
+function updateSettingsInputs() {
+    // Set inputs to the selected map's defaults, falling back to current global vars if not defined
+    document.getElementById("laps-input").value = selectedMap.default_laps !== undefined ? selectedMap.default_laps : LAPS;
+    document.getElementById("speed-input").value = selectedMap.default_speed !== undefined ? selectedMap.default_speed : SPEED;
+    document.getElementById("bounce-input").value = selectedMap.default_bounce !== undefined ? selectedMap.default_bounce : BOUNCE;
+    
+    // Update the description text
+    document.getElementById("map-description").textContent = selectedMap.description;
+    
+    // Update map selection highlight
+    document.querySelectorAll('#map-options-container .map-option').forEach(el => {
+        if (el.dataset.mapId === selectedMap.id) {
+            el.classList.add('selected');
+        } else {
+            el.classList.remove('selected');
+        }
+    });
+}
+
+
+// Function to create the modal HTML structure
+function createSettingsModal() {
+    // If the modal exists, just ensure it's up-to-date and return
+    if (document.getElementById("host-settings-modal")) {
+        updateSettingsInputs();
+        return;
     }
+    
+    var mapOptionsHTML = PRESET_MAPS.map((map) => `
+        <div class="map-option ${map.id === selectedMap.id ? 'selected' : ''}" data-map-id="${map.id}" onclick="selectMap('${map.id}')">
+            <span class="map-icon">${map.icon}</span>
+            <span class="map-name">${map.name}</span>
+        </div>
+    `).join('');
+    
+    var modal = document.createElement("DIV");
+    modal.id = "host-settings-modal";
+    
+    modal.innerHTML = `
+        <h2>Lobby Setup</h2>
+
+        <div class="setting-group">
+            <h3>1. Select Map</h3>
+            <div id="map-options-container">
+                ${mapOptionsHTML}
+            </div>
+            <p id="map-description">${selectedMap.description}</p>
+        </div>
+
+        <div class="setting-group">
+            <h3>2. Adjust Settings</h3>
+            <div class="setting-item">
+                <label for="laps-input">Total Laps</label>
+                <input type="number" id="laps-input" value="${LAPS}" min="1" max="99">
+            </div>
+            <div class="setting-item">
+                <label for="speed-input">Base Speed</label>
+                <input type="number" id="speed-input" value="${SPEED}" step="0.001" min="0.001" max="0.01">
+            </div>
+            <div class="setting-item">
+                <label for="bounce-input">Bounce Factor (BOUNCE)</label>
+                <input type="number" id="bounce-input" value="${BOUNCE}" step="0.05" min="0.0" max="1.0">
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>3. Custom Map Data (From Editor)</h3>
+            <textarea id="custom-map-data" placeholder="Paste your map code from the editor here (e.g., walls=[...]). This will override the selected map."></textarea>
+        </div>
+
+        <div class="modal-buttons">
+            <div class="menuitem button" onclick="applySettings()">Start Custom Game</div>
+            <div class="menuitem button" onclick="closeSettingsModal()">Cancel</div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+
+    // Initial call to ensure settings inputs match the default selected map
+    updateSettingsInputs();
+}
+
+// Note: You still need to implement the 'applySettings' and 'quickHostGame' 
+// functions to complete the flow, using the logic discussed previously.
 
 	function refreshgame() {
     window.location.reload(); 
