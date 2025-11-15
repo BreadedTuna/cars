@@ -68,6 +68,21 @@ input{
 	transition: transform .5s ease-out, -webkit-transform .5s ease-out;
 /* 	animation: slideleft 1s -0.5s ease-out forwards; */
 }
+
+/* Styling for the Main Menu Button after a win */
+#main-menu-btn {
+    /* Position the button at 70% down the screen, as requested */
+    position: absolute;
+    top: 70vh;
+    
+    /* Ensure it is horizontally centered */
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Ensure it is visible above the countdown/Won! message */
+    z-index: 100001;
+}
+
 #name{
 	background-color: rgba(0, 0, 0, 0.5);
 	outline: none;
