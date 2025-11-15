@@ -995,7 +995,6 @@ function join(){
     document.getElementById("countdown").style.fontSize = "25vmin";
     document.getElementById("countdown").innerHTML = play.data.name.replaceAll("<", "&lt;") + " Won!";
 
-    // Check if button exists
     if (!document.getElementById("main-menu-btn")) {
 
         var menuBtn = document.createElement("DIV");
@@ -1008,27 +1007,16 @@ function join(){
         };
         menuBtn.setAttribute("ontouchstart", "this.click()");
 
-        // --- POSITION & SLIDE-IN FIX ---
-        // This sets the button's final position immediately,
-        // overriding the 'menuitem' slide-in animation.
+        // --- Simplified Styles ---
+        // We only set the *base* position. The new CSS rule will handle the hover.
         menuBtn.style.position = "absolute";
         menuBtn.style.top = "70vh";
         menuBtn.style.left = "50%";
-        menuBtn.style.transform = "translateX(-50%)"; // Center it
+        menuBtn.style.transform = "translateX(-50%)"; // Set initial centered state
         menuBtn.style.zIndex = "100001";
         
-        // --- HOVER FIX ---
-        // We apply the hover effect manually to combine scaling AND centering.
-        menuBtn.onmouseover = function() {
-            // Combine the centering with the scaling
-            this.style.transform = "translateX(-50%) scale(0.9)";
-        };
-        menuBtn.onmouseout = function() {
-            // Return to just being centered
-            this.style.transform = "translateX(-50%) scale(1)";
-        };
+        // NO onmouseover or onmouseout needed.
 
-        // Add the button to the screen
         f.appendChild(menuBtn);
     }
 }
