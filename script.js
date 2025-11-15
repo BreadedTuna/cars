@@ -13,9 +13,9 @@ const PRESET_MAPS = [
     {
         id: 'default_track', 
         name: 'The Starter Loop',
-        description: 'A simple, classic 3-lap oval with low bounce. The default track for quick games.',
-        icon: '🏁', 
-        map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}]', // Example Map Code
+        description: 'A simple, classic 3-lap oval. Recommended for newcomers.',
+        image_url: 'assets/map_starter_loop.png', // <-- REPLACE WITH YOUR IMAGE PATH
+        map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}]',
         default_laps: 3,
         default_speed: 0.004,
         default_bounce: 0.7
@@ -23,14 +23,13 @@ const PRESET_MAPS = [
     {
         id: 'city_circuit',
         name: 'City Circuit Night Run',
-        description: 'A technical circuit with tight turns and high walls. Adjust settings for a challenge!',
-        icon: '🌃',
-        map_code: 'walls=[{"x1":-10,"z1":-30,"x2":10,"z2":-30}, {"x1":-10,"z1":-30,"x2":-10,"z2":30}, {"x1":-10,"z1":30,"x2":10,"z2":30}, {"x1":10,"z1":30,"x2":10,"z2":-30}]', // Example Map Code
+        description: 'A technical circuit with tight turns and high walls. Requires precision and skill.',
+        image_url: 'assets/map_city_circuit.png', // <-- REPLACE WITH YOUR IMAGE PATH
+        map_code: 'walls=[{"x1":-10,"z1":-30,"x2":10,"z2":-30}, {"x1":-10,"z1":-30,"x2":-10,"z2":30}, {"x1":-10,"z1":30,"x2":10,"z2":30}, {"x1":10,"z1":30,"x2":10,"z2":-30}]',
         default_laps: 5,
         default_speed: 0.003,
         default_bounce: 0.85
     }
-    // Add more maps here
 ];
 
 // Variable to track the map selected in the modal
@@ -1430,8 +1429,6 @@ function closeSettingsModal() {
     document.getElementById("host-settings-modal-container").classList.remove("active");
 }
 
-// --- Settings/Map Logic ---
-
 // Handler for map selection buttons
 function selectMap(mapId) {
     selectedMap = PRESET_MAPS.find(m => m.id === mapId);
@@ -1440,13 +1437,14 @@ function selectMap(mapId) {
 
 // Function to update the settings inputs when a new map is selected
 function updateSettingsInputs() {
+    // Check if the inputs exist before trying to update them (they might not be created yet)
+    const lapsInput = document.getElementById("laps-input");
+    if (!lapsInput) return;
+    
     // Set inputs to the selected map's defaults, falling back to current global vars if not defined
-    document.getElementById("laps-input").value = selectedMap.default_laps !== undefined ? selectedMap.default_laps : LAPS;
+    lapsInput.value = selectedMap.default_laps !== undefined ? selectedMap.default_laps : LAPS;
     document.getElementById("speed-input").value = selectedMap.default_speed !== undefined ? selectedMap.default_speed : SPEED;
     document.getElementById("bounce-input").value = selectedMap.default_bounce !== undefined ? selectedMap.default_bounce : BOUNCE;
-    
-    // Update the description text
-    document.getElementById("map-description").textContent = selectedMap.description;
     
     // Update map selection highlight
     document.querySelectorAll('#map-options-container .map-option').forEach(el => {
@@ -1461,16 +1459,20 @@ function updateSettingsInputs() {
 
 // Function to create the modal HTML structure
 function createSettingsModal() {
-    // If the modal exists, just ensure it's up-to-date and return
+    // If the modal container exists, just ensure it's up-to-date and return
     if (document.getElementById("host-settings-modal-container")) {
         updateSettingsInputs();
         return;
     }
     
+    // Generates map selection HTML with the new layout
     var mapOptionsHTML = PRESET_MAPS.map((map) => `
         <div class="map-option ${map.id === selectedMap.id ? 'selected' : ''}" data-map-id="${map.id}" onclick="selectMap('${map.id}')">
-            <span class="map-icon">${map.icon}</span>
-            <span class="map-name">${map.name}</span>
+            <img src="${map.image_url}" class="map-image" alt="${map.name}">
+            <div class="map-details">
+                <span class="map-name">${map.name}</span>
+                <span class="map-description-text">${map.description}</span>
+            </div>
         </div>
     `).join('');
     
@@ -1485,38 +1487,37 @@ function createSettingsModal() {
     menu.innerHTML = `
         <h2>Lobby Setup</h2>
 
-        <div class="setting-group">
-            <h3>1. Select Map</h3>
+        <div class="map-selection-section">
+            
             <div id="map-options-container">
+                <h3>1. Select Map</h3>
                 ${mapOptionsHTML}
             </div>
-            <p id="map-description">${selectedMap.description}</p>
-        </div>
 
-        <div class="setting-group">
-            <h3>2. Adjust Settings</h3>
-            <div class="setting-item">
-                <label for="laps-input">Total Laps</label>
-                <input type="number" id="laps-input" value="${LAPS}" min="1" max="99">
+            <div class="settings-input-section">
+                
+                <h3>2. Game Settings</h3>
+                <div class="setting-item">
+                    <label for="laps-input">LAPS</label>
+                    <input type="number" id="laps-input" value="${LAPS}" min="1" max="99">
+                </div>
+                <div class="setting-item">
+                    <label for="speed-input">SPEED MULTIPLIER</label>
+                    <input type="number" id="speed-input" value="${SPEED}" step="0.001" min="0.001" max="0.01">
+                </div>
+                <div class="setting-item">
+                    <label for="bounce-input">BOUNCE</label>
+                    <input type="number" id="bounce-input" value="${BOUNCE}" step="0.05" min="0.0" max="1.0">
+                </div>
+                
+                <h3>3. Custom Map Data</h3>
+                <textarea id="custom-map-data" placeholder="Paste your map code from the editor here (e.g., walls=[...]). This will override the selected map."></textarea>
             </div>
-            <div class="setting-item">
-                <label for="speed-input">Base Speed (SPEED)</label>
-                <input type="number" id="speed-input" value="${SPEED}" step="0.001" min="0.001" max="0.01">
-            </div>
-            <div class="setting-item">
-                <label for="bounce-input">Bounce Factor (BOUNCE)</label>
-                <input type="number" id="bounce-input" value="${BOUNCE}" step="0.05" min="0.0" max="1.0">
-            </div>
-        </div>
-        
-        <div class="setting-group">
-            <h3>3. Custom Map Data (From Editor)</h3>
-            <textarea id="custom-map-data" placeholder="Paste your map code from the editor here (e.g., walls=[...]). This will override the selected map."></textarea>
         </div>
 
         <div class="modal-buttons">
             <div class="button" onclick="closeSettingsModal()">Cancel</div>
-            <div class="button" onclick="applySettings()">Start Custom Game</div>
+            <div class="button" onclick="applySettings()">Continue to Host</div>
         </div>
     `;
     
@@ -1528,7 +1529,7 @@ function createSettingsModal() {
 }
 
 // NOTE: You still need to implement the actual hosting logic in `applySettings()` 
-// and create the `quickHostGame()` function to complete the two-button flow!
+// and create the `quickHostGame()` function to complete the flow!
 function applySettings() {
     alert("Apply settings logic needs to be implemented to host the game.");
     // This is where you will read inputs, check for custom map code, and call hostGame(...)
