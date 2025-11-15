@@ -8,11 +8,12 @@ var BOUNCE_CORRECT = 0.01;
 var WALL_SIZE = 1.2;
 var MOUNTAIN_DIST = 250;
 var OOB_DIST = 200;
+// Global array to store pre-built map data
 const PRESET_MAPS = [
     {
-        id: 'default_track', // Used internally
+        id: 'default_track', 
         name: 'The Starter Loop',
-        description: 'A simple, classic 3-lap oval with low bounce. The perfect starting grid.',
+        description: 'A simple, classic 3-lap oval with low bounce. The default track for quick games.',
         icon: '🏁', 
         map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}]', // Example Map Code
         default_laps: 3,
@@ -22,16 +23,17 @@ const PRESET_MAPS = [
     {
         id: 'city_circuit',
         name: 'City Circuit Night Run',
-        description: 'A technical circuit with tight turns and high walls. Requires precision.',
+        description: 'A technical circuit with tight turns and high walls. Adjust settings for a challenge!',
         icon: '🌃',
         map_code: 'walls=[{"x1":-10,"z1":-30,"x2":10,"z2":-30}, {"x1":-10,"z1":-30,"x2":-10,"z2":30}, {"x1":-10,"z1":30,"x2":10,"z2":30}, {"x1":10,"z1":30,"x2":10,"z2":-30}]', // Example Map Code
         default_laps: 5,
         default_speed: 0.003,
         default_bounce: 0.85
     }
-    // Add more maps here as needed!
+    // Add more maps here
 ];
 
+// Variable to track the map selected in the modal
 var selectedMap = PRESET_MAPS[0];
 var LAPS = 3;
 
