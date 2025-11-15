@@ -1023,6 +1023,7 @@ if(play.data.lap > LAPS && document.getElementById("countdown").innerHTML == "")
 						}
 						// --- ✅ UPDATED CODE ENDS HERE ---
 					}
+					}
 					
 					for(var pl in players){
 						if(play != players[pl] && play.model.position.distanceTo(players[pl].model.position) < 2){
