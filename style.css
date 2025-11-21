@@ -383,40 +383,42 @@ input{
 }
 
 #host-settings-menu {
-	/* This is the main panel, copied from your editor */
-	width: calc(100vw - 40vmin);
+	/* --- FIX 1: CENTERING --- */
+	/* I removed 'margin-left: 20vmin;' which was pushing it right */
+	width: calc(100vw - 40vmin); /* This is the 60vw-ish width from editor */
+	max-width: 900px; /* Added a max-width for very large screens */
+	
 	background-color: rgba(0, 0, 0, 0.75);
-	margin-left: 20vmin;
 	vertical-align: middle;
 	cursor: default; /* Not clickable */
 	position: relative;
 	padding: 5vmin;
 	box-sizing: border-box;
-	font-size: 2.3vmin;
-	line-height: 1.5;
 	display: inline-block;
 	color: white;
 	text-align: left; /* Align content left */
-	border: 2px solid white; /* Added this border to match editor's .button style */
+	border: 2px solid white;
 }
 
-#host-settings-menu h1, #host-settings-menu p {
+/* --- FIX 2: FONTS --- */
+#host-settings-menu h1 {
 	text-align: center;
 	color: white;
-    font-family: Monoton; /* Use the game's title font */
-}
-
-#host-settings-menu h1 {
-    font-size: 5vmin;
-    margin-bottom: 2vmin;
-	text-shadow: 0 0 1vmin white;
+	font-family: Arial, sans-serif; /* Changed from Monoton */
+	font-weight: bold;
+	font-size: 5vmin;
+	margin-bottom: 2vmin;
+	text-shadow: none; /* Removed the game's title shadow */
 }
 
 #host-settings-menu p {
-    font-family: Arial, sans-serif;
-    font-size: 2.3vmin;
-    margin-bottom: 3vmin;
+	text-align: center;
+	color: white;
+	font-family: Arial, sans-serif; /* Changed from Monoton */
+	font-size: 2.3vmin;
+	margin-bottom: 3vmin;
 }
+/* --- (End Font Fix) --- */
 
 .setting-item {
 	margin: 20px 0;
@@ -454,27 +456,33 @@ input{
 	justify-content: space-around;
 }
 
-/* IMPORTANT: This styles the .button class ONLY inside the modal */
+/* --- FIX 3: BUTTONS --- */
+/* This selector is now much stronger to override the game's .button style */
 .setting-buttons .button {
-	width: auto; /* Fit content */
-	height: auto;
-	padding: 10px 20px;
-	line-height: 1.5; /* Adjust line height */
-	font-size: 2.5vmin;
+    /* --- Resetting the game's .button styles --- */
+    position: relative !important; 
+    width: auto !important;
+    height: auto !important;
+    left: auto !important;
+    font-size: 2.5vmin !important; /* Must use !important to beat 10vmin */
+    line-height: 1.5 !important;
+    padding: 10px 20px !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
     
-    /* Overriding main game's .button styles */
-    position: relative; 
-    left: auto;
-    border: 2px solid black;
-    text-shadow: none;
+    /* --- Applying the editor's .button styles --- */
+    border: 2px solid black !important;
+    margin: 5px;
+    cursor: pointer;
     transition: border .1s, transform .1s;
-    box-shadow: none;
 }
 
 .setting-buttons .button:hover {
+    /* --- Overriding the game's .button:hover --- */
     transform: scale(1.1) !important; /* Use editor's hover */
-    border: 2px solid white;
-    box-shadow: none;
+    border: 2px solid white !important; /* Use editor's border */
+    box-shadow: none !important;
 }
 
 .info{
