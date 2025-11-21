@@ -364,106 +364,108 @@ input{
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
-/* --- Lobby Setup Modal (Copied from Track Editor) --- */
+/* --- Lobby Setup Modal (Updated & Fixed) --- */
 #host-settings-modal-container {
-	/* This creates the full-screen container */
-	line-height: 100vh;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw; /* Full width */
-	text-align: center; /* Center the menu */
-	transition: transform 0.5s;
-	transform: translateY(-200vh); /* Start hidden (off screen) */
-	z-index: 200000; /* High z-index to be on top */
+    line-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    transition: transform 0.5s;
+    transform: translateY(-200vh);
+    z-index: 200000;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center modal vertically */
 }
 
 #host-settings-modal-container.active {
-	transform: translateY(0); /* Visible state */
+    transform: translateY(0);
 }
 
 #host-settings-menu {
-	/* This is the main panel, copied from your editor */
-	width: calc(100vw - 40vmin);
-	background-color: rgba(0, 0, 0, 0.75);
-	margin-left: 20vmin;
-	vertical-align: middle;
-	cursor: default; /* Not clickable */
-	position: relative;
-	padding: 5vmin;
-	box-sizing: border-box;
-	font-size: 2.3vmin;
-	line-height: 1.5;
-	display: inline-block;
-	color: white;
-	text-align: left; /* Align content left */
-	border: 2px solid white; /* Added this border to match editor's .button style */
+    width: clamp(300px, 70vmin, 900px); /* Properly responsive */
+    background-color: rgba(0, 0, 0, 0.75);
+    margin: auto; /* Center horizontally */
+    cursor: default;
+    position: relative;
+    padding: clamp(20px, 3vmin, 40px);
+    box-sizing: border-box;
+
+    font-size: clamp(14px, 1.8vmin, 20px);
+    line-height: 1.5;
+    display: block;
+    color: white;
+    text-align: left;
+    border: 2px solid white;
 }
 
-#host-settings-menu h1, #host-settings-menu p {
-	text-align: center;
-	color: white;
-    font-family: Monoton; /* Use the game's title font */
+#host-settings-menu h1,
+#host-settings-menu p {
+    text-align: center;
+    color: white;
+    font-family: Monoton;
 }
 
 #host-settings-menu h1 {
-    font-size: 5vmin;
+    font-size: clamp(30px, 5vmin, 60px);
     margin-bottom: 2vmin;
-	text-shadow: 0 0 1vmin white;
+    text-shadow: 0 0 1vmin white;
 }
 
 #host-settings-menu p {
     font-family: Arial, sans-serif;
-    font-size: 2.3vmin;
+    font-size: clamp(14px, 1.8vmin, 20px);
     margin-bottom: 3vmin;
 }
 
 .setting-item {
-	margin: 20px 0;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-family: Arial, sans-serif;
 }
 
 .setting-item label {
-	color: white;
-	font-size: 2.5vmin;
-	font-weight: bold;
+    color: white;
+    font-size: clamp(16px, 2vmin, 26px);
+    font-weight: bold;
 }
 
 #host-settings-menu input[type="number"] {
-	background-color: #333;
-	color: white;
-	border: 1px solid #888;
-	padding: 10px;
-	font-size: 2.5vmin;
-	width: 150px;
-	border-radius: 5px;
+    background-color: #333;
+    color: white;
+    border: 1px solid #888;
+    padding: 10px;
+    font-size: clamp(14px, 2vmin, 20px);
+    width: 150px;
+    border-radius: 5px;
     font-family: Arial, sans-serif;
 }
 
 #host-settings-menu input[type="range"] {
-	width: 200px;
-	cursor: pointer;
+    width: 200px;
+    cursor: pointer;
 }
 
 .setting-buttons {
-	margin-top: 30px;
-	display: flex;
-	justify-content: space-around;
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-around;
 }
 
-/* IMPORTANT: This styles the .button class ONLY inside the modal */
+/* Fix button size */
 .setting-buttons .button {
-	width: auto; /* Fit content */
-	height: auto;
-	padding: 10px 20px;
-	line-height: 1.5; /* Adjust line height */
-	font-size: 2.5vmin;
-    
-    /* Overriding main game's .button styles */
-    position: relative; 
+    width: auto;
+    height: auto;
+    padding: 10px 20px;
+    line-height: 1.5;
+    font-size: clamp(14px, 2vmin, 22px);
+
+    position: relative;
     left: auto;
     border: 2px solid black;
     text-shadow: none;
@@ -472,10 +474,11 @@ input{
 }
 
 .setting-buttons .button:hover {
-    transform: scale(1.1) !important; /* Use editor's hover */
+    transform: scale(1.1) !important;
     border: 2px solid white;
     box-shadow: none;
 }
+
 
 .info{
 	position: absolute;
