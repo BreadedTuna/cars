@@ -399,24 +399,31 @@ input{
 /* FIX: Prevent global game .button from leaking */
 /* ------------------------------ */
 
+/* FIX: Proper override without wiping your font */
 #host-settings-menu .button {
-    all: unset;                /* wipe ALL inherited styles */
+    all: unset;
     display: inline-block;
-    padding: 10px 24px;
-    border-radius: 6px;
+
+    /* Your original game font restored */
+    font-family: inherit; 
+    font-size: 2.3vmin;
+
+    /* Normal button styling */
+    padding: 1vmin 2vmin;
+    color: white;
     background: rgba(255,255,255,0.1);
     border: 2px solid white;
-    color: white;
-    font-size: 2vmin;
-    text-align: center;
+    border-radius: 0.5vmin;
     cursor: pointer;
-    transition: transform 0.1s, border-color 0.1s;
+    text-align: center;
+    transition: transform .1s, border-color .1s;
 }
 
 #host-settings-menu .button:hover {
-    transform: scale(1.08);
+    transform: scale(1.06);
     border-color: #00aaff;
 }
+
 
 /* Inputs stay the same */
 .setting-item {
