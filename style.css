@@ -364,18 +364,15 @@ input{
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
-/* --- Lobby Setup Modal (Minimal Fix Version) --- */
+/* --- Lobby Setup Modal (Copied from Track Editor) --- */
 #host-settings-modal-container {
-    position: fixed;
-    inset: 0;
+    line-height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
-    height: 100vh;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    transition: transform 0.4s ease;
+    text-align: center;
+    transition: transform 0.5s;
     transform: translateY(-200vh);
     z-index: 200000;
 }
@@ -386,55 +383,53 @@ input{
 
 #host-settings-menu {
     width: calc(100vw - 40vmin);
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 0, 0, 0.85); /* Darker for readability */
+    margin-left: 20vmin;
+    vertical-align: middle;
+    cursor: default;
+    position: relative;
     padding: 5vmin;
-    border: 2px solid white;
     box-sizing: border-box;
-
     font-size: 2.3vmin;
-    color: white;
-}
-
-/* ------------------------------ */
-/* FIX: Prevent global game .button from leaking */
-/* ------------------------------ */
-
-/* FIX: Proper override without wiping your font */
-#host-settings-menu .button {
-    all: unset;
+    line-height: 1.5;
     display: inline-block;
-
-    /* Your original game font restored */
-    font-family: inherit; 
-    font-size: 2.3vmin;
-
-    /* Normal button styling */
-    padding: 1vmin 2vmin;
     color: white;
-    background: rgba(255,255,255,0.1);
+
+    font-family: Arial, sans-serif; /* CHANGED HERE */
+    text-align: left;
     border: 2px solid white;
-    border-radius: 0.5vmin;
-    cursor: pointer;
+}
+
+#host-settings-menu h1,
+#host-settings-menu p {
     text-align: center;
-    transition: transform .1s, border-color .1s;
+    color: white;
+    font-family: Arial, sans-serif; /* CHANGED HERE */
 }
 
-#host-settings-menu .button:hover {
-    transform: scale(1.06);
-    border-color: #00aaff;
+#host-settings-menu h1 {
+    font-size: 5vmin;
+    margin-bottom: 2vmin;
+    text-shadow: 0 0 1vmin white;
 }
 
+#host-settings-menu p {
+    font-family: Arial, sans-serif;
+    font-size: 2.3vmin;
+    margin-bottom: 3vmin;
+}
 
-/* Inputs stay the same */
 .setting-item {
+    margin: 20px 0;
     display: flex;
     justify-content: space-between;
-    margin: 20px 0;
+    align-items: center;
+    font-family: Arial, sans-serif;
 }
 
 .setting-item label {
     color: white;
-    font-size: clamp(16px, 2vmin, 26px);
+    font-size: 2.5vmin;
     font-weight: bold;
 }
 
@@ -443,7 +438,7 @@ input{
     color: white;
     border: 1px solid #888;
     padding: 10px;
-    font-size: clamp(14px, 2vmin, 20px);
+    font-size: 2.5vmin;
     width: 150px;
     border-radius: 5px;
     font-family: Arial, sans-serif;
@@ -454,33 +449,62 @@ input{
     cursor: pointer;
 }
 
+/* Buttons container */
 .setting-buttons {
     margin-top: 30px;
     display: flex;
     justify-content: space-around;
 }
 
-/* Fix button size */
+/* --- MATCH GAME BUTTON STYLE (Fixed sizing) --- */
+#host-settings-menu .button {
+    all: unset;
+    display: inline-block;
+
+    font-family: Arial, sans-serif;
+    color: white;
+    font-size: 3vmin;
+
+    padding: 1.5vmin 3vmin;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    border: 1vmin solid white;
+    border-radius: 0;
+    cursor: pointer;
+    text-align: center;
+
+    box-shadow: 0 2vmin 3vmin rgba(0,0,0,0.5);
+    transition: transform .2s, box-shadow .2s;
+}
+
+#host-settings-menu .button:hover {
+    transform: scale(0.9);
+    box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.5);
+}
+
+/* For safety: same rule for .setting-buttons .button */
 .setting-buttons .button {
     width: auto;
     height: auto;
-    padding: 10px 20px;
-    line-height: 1.5;
-    font-size: clamp(14px, 2vmin, 22px);
 
-    position: relative;
-    left: auto;
-    border: 2px solid black;
-    text-shadow: none;
-    transition: border .1s, transform .1s;
-    box-shadow: none;
+    padding: 1.5vmin 3vmin;
+    line-height: 1;
+    font-size: 3vmin;
+
+    background-color: rgba(0,0,0,0.5);
+    border: 1vmin solid white;
+
+    cursor: pointer;
+    box-shadow: 0 2vmin 3vmin rgba(0,0,0,0.5);
+
+    transition: transform .2s, box-shadow .2s;
 }
 
 .setting-buttons .button:hover {
-    transform: scale(1.1) !important;
-    border: 2px solid white;
-    box-shadow: none;
+    transform: scale(0.9);
+    box-shadow: 0 0.5vmin 1vmin rgba(0,0,0,0.5);
 }
+
 
 
 .info{
