@@ -484,6 +484,51 @@ input{
     border-color: #8cf;
 }
 
+/* FIX THE BUTTONS INSIDE HOST SETTINGS MENU */
+#host-settings-menu .button,
+#host-settings-menu .menu-button,
+#host-settings-menu button {
+    all: unset !important;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Match the game UI sizing */
+    width: 12vmin;
+    height: 4vmin;
+
+    font-family: inherit;
+    font-size: 1.8vmin;
+    font-weight: 600;
+    color: #fff;
+
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 0.6vmin;
+
+    cursor: pointer;
+    transition: 0.12s ease;
+    box-sizing: border-box;
+
+    /* Prevent giant scaling from outer transforms */
+    transform: none !important;
+}
+
+/* Hover effect like the game UI */
+#host-settings-menu .button:hover {
+    border-color: #00aaff;
+    background: rgba(255,255,255,0.14);
+}
+
+/* Put buttons next to each other cleanly */
+#host-settings-menu .button-row {
+    display: flex;
+    justify-content: center;
+    gap: 3vmin;
+    margin-top: 4vmin;
+}
+
 
 .info{
 	position: absolute;
