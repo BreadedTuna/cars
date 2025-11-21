@@ -1417,6 +1417,7 @@ function startMenu() {
 // --- Modal Visibility Handlers ---
 
 // Function to start the Custom Host flow (called by the "Custom Host" menu button)
+// Function to start the Custom Host flow (called by the "Custom Host" menu button)
 function hostsettings() {
     createSettingsModal();
     // Show the modal by setting the active class on the container
@@ -1475,7 +1476,7 @@ function createSettingsModal() {
             <input type="number" id="setting-laps" value="${LAPS}" step="1" min="1">
         </div>
         
-        <div class="setting-buttons">
+        <div class="button-row">
             <div class="button" onclick="closeSettingsModal()">Cancel</div>
             <div class="button" onclick="applySettings()">Continue to Host</div>
         </div>
@@ -1500,7 +1501,7 @@ function applySettings() {
 // Note: You still need to implement the 'applySettings' and 'quickHostGame' 
 // functions to complete the flow, using the logic discussed previously.
 
-	function refreshgame() {
+function refreshgame() {
     window.location.reload(); 
 }
 
