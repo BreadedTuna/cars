@@ -1429,52 +1429,12 @@ function closeSettingsModal() {
     document.getElementById("host-settings-modal-container").classList.remove("active");
 }
 
-// Handler for map selection buttons
-function selectMap(mapId) {
-    selectedMap = PRESET_MAPS.find(m => m.id === mapId);
-    updateSettingsInputs();
-}
-
-// Function to update the settings inputs when a new map is selected
-function updateSettingsInputs() {
-    // Check if the inputs exist before trying to update them (they might not be created yet)
-    const lapsInput = document.getElementById("laps-input");
-    if (!lapsInput) return;
-    
-    // Set inputs to the selected map's defaults, falling back to current global vars if not defined
-    lapsInput.value = selectedMap.default_laps !== undefined ? selectedMap.default_laps : LAPS;
-    document.getElementById("speed-input").value = selectedMap.default_speed !== undefined ? selectedMap.default_speed : SPEED;
-    document.getElementById("bounce-input").value = selectedMap.default_bounce !== undefined ? selectedMap.default_bounce : BOUNCE;
-    
-    // Update map selection highlight
-    document.querySelectorAll('#map-options-container .map-option').forEach(el => {
-        if (el.dataset.mapId === selectedMap.id) {
-            el.classList.add('selected');
-        } else {
-            el.classList.remove('selected');
-        }
-    });
-}
-
-
 // Function to create the modal HTML structure
 function createSettingsModal() {
-    // If the modal container exists, just ensure it's up-to-date and return
+    // If the modal container exists, just return.
     if (document.getElementById("host-settings-modal-container")) {
-        updateSettingsInputs();
         return;
     }
-    
-    // Generates map selection HTML with the new layout
-    var mapOptionsHTML = PRESET_MAPS.map((map) => `
-        <div class="map-option ${map.id === selectedMap.id ? 'selected' : ''}" data-map-id="${map.id}" onclick="selectMap('${map.id}')">
-            <img src="${map.image_url}" class="map-image" alt="${map.name}">
-            <div class="map-details">
-                <span class="map-name">${map.name}</span>
-                <span class="map-description-text">${map.description}</span>
-            </div>
-        </div>
-    `).join('');
     
     // Create the container element (for the slide-in animation)
     var container = document.createElement("DIV");
@@ -1484,38 +1444,38 @@ function createSettingsModal() {
     var menu = document.createElement("DIV");
     menu.id = "host-settings-menu";
     
+    // This HTML is a direct copy of your track editor's settings menu,
+    // adapted to use your main game's function names and variables.
     menu.innerHTML = `
-        <h2>Lobby Setup</h2>
-
-        <div class="map-selection-section">
-            
-            <div id="map-options-container">
-                <h3>1. Select Map</h3>
-                ${mapOptionsHTML}
-            </div>
-
-            <div class="settings-input-section">
-                
-                <h3>2. Game Settings</h3>
-                <div class="setting-item">
-                    <label for="laps-input">LAPS</label>
-                    <input type="number" id="laps-input" value="${LAPS}" min="1" max="99">
-                </div>
-                <div class="setting-item">
-                    <label for="speed-input">SPEED MULTIPLIER</label>
-                    <input type="number" id="speed-input" value="${SPEED}" step="0.001" min="0.001" max="0.01">
-                </div>
-                <div class="setting-item">
-                    <label for="bounce-input">BOUNCE</label>
-                    <input type="number" id="bounce-input" value="${BOUNCE}" step="0.05" min="0.0" max="1.0">
-                </div>
-                
-                <h3>3. Custom Map Data</h3>
-                <textarea id="custom-map-data" placeholder="Paste your map code from the editor here (e.g., walls=[...]). This will override the selected map."></textarea>
-            </div>
+        <h1>Game Settings</h1>
+        <p>Set the game properties for your track.</p>
+        
+        <div class="setting-item">
+            <label for="setting-speed">SPEED MULTIPLIER</label>
+            <input type="number" id="setting-speed" value="${SPEED}" step="0.001" min="0.001" max="0.01">
         </div>
-
-        <div class="modal-buttons">
+        
+        <div class="setting-item">
+            <label for="setting-bounce">BOUNCE (<span id="bounce-value">${BOUNCE}</span>)</label>
+            <input type="range" id="setting-bounce" min="0" max="1" value="${BOUNCE}" step="0.05" oninput="document.getElementById('bounce-value').innerText = this.value">
+        </div>
+        
+        <div class="setting-item">
+            <label for="setting-mountain">MOUNTAIN_DIST</label>
+            <input type="number" id="setting-mountain" value="325" step="5">
+        </div>
+        
+        <div class="setting-item">
+            <label for="setting-oob">OOB_DIST</label>
+            <input type="number" id="setting-oob" value="300" step="5">
+        </div>
+        
+        <div class="setting-item">
+            <label for="setting-laps">LAPS</label>
+            <input type="number" id="setting-laps" value="${LAPS}" step="1" min="1">
+        </div>
+        
+        <div class="setting-buttons">
             <div class="button" onclick="closeSettingsModal()">Cancel</div>
             <div class="button" onclick="applySettings()">Continue to Host</div>
         </div>
@@ -1523,16 +1483,18 @@ function createSettingsModal() {
     
     container.appendChild(menu);
     document.body.appendChild(container);
-
-    // Initial call to ensure settings inputs match the default selected map
-    updateSettingsInputs();
 }
 
-// NOTE: You still need to implement the actual hosting logic in `applySettings()` 
-// and create the `quickHostGame()` function to complete the flow!
+// This function is called by the "Continue to Host" button
 function applySettings() {
     alert("Apply settings logic needs to be implemented to host the game.");
     // This is where you will read inputs, check for custom map code, and call hostGame(...)
+    
+    // Example of how to read the new values:
+    // const newLaps = document.getElementById("setting-laps").value;
+    // const newSpeed = document.getElementById("setting-speed").value;
+    // const newBounce = document.getElementById("setting-bounce").value;
+    // console.log("New settings:", newLaps, newSpeed, newBounce);
 }
 
 // Note: You still need to implement the 'applySettings' and 'quickHostGame' 
