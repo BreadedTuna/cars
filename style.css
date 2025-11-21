@@ -362,6 +362,7 @@ input{
 	-webkit-transform: scale(0.9) !important;
 	        transform: scale(0.9) !important;
 }
+
 /* --- Lobby Setup Modal --- */
 #host-settings-modal-container {
     position: fixed;
@@ -385,9 +386,9 @@ input{
 
 /* CENTERED MENU */
 #host-settings-menu {
-    /* --- CHANGED (Request 1: Bigger Menu) --- */
-    width: 75vw;       /* Was 60vw */
-    max-width: 1300px; /* Was 1100px */
+    /* --- UPDATED (Request 1: Bigger Menu) --- */
+    width: 85vw;       /* Was 75vw */
+    max-width: 1500px; /* Was 1300px */
 
     background-color: rgba(0, 0, 0, 0.85);
 
@@ -414,9 +415,8 @@ input{
 #host-settings-menu h1 {
     font-size: 4.5vmin;
     margin-bottom: 1.5vmin;
-    
-    /* --- CHANGED (Request 3: Less Glowy Title) --- */
-    text-shadow: 0 0 0.4vmin rgba(255, 255, 255, 0.8); /* Was '0 0 1vmin white' */
+    /* This keeps the title less glowy from our last fix */
+    text-shadow: 0 0 0.4vmin rgba(255, 255, 255, 0.8);
 }
 
 #host-settings-menu p {
@@ -452,57 +452,48 @@ input{
     cursor: pointer;
 }
 
-/* --- REMOVED --- */
-/* Deleted the old '.setting-buttons' rule as it's replaced by '.button-row' */
-/* Deleted the first conflicting '.button' and ':hover' rules and the extra '}' syntax error */
-
-
-/* --- KEPT (Request 2: Actual Buttons) --- */
-/* This is the style block that makes your buttons look correct */
+/* BUTTON STYLES (Unchanged) */
+/* This block styles the individual buttons */
 #host-settings-menu .button,
 #host-settings-menu .menu-button,
 #host-settings-menu button {
     all: unset !important;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    /* Match the game UI sizing */
     width: 12vmin;
     height: 4vmin;
-
     font-family: inherit;
     font-size: 1.8vmin;
     font-weight: 600;
     color: #fff;
-
     background: rgba(255,255,255,0.08);
     border: 2px solid rgba(255,255,255,0.4);
     border-radius: 0.6vmin;
-
     cursor: pointer;
     transition: 0.12s ease;
     box-sizing: border-box;
-
-    /* Prevent giant scaling from outer transforms */
     transform: none !important;
 }
 
-/* Hover effect like the game UI */
+/* Hover effect like the game UI (Unchanged) */
 #host-settings-menu .button:hover {
     border-color: #00aaff;
     background: rgba(255,255,255,0.14);
 }
 
-/* This rule now works because the JS uses '.button-row' */
+/* BUTTON LAYOUT (This is the container) */
 #host-settings-menu .button-row {
     display: flex;
-    justify-content: center;
-    gap: 3vmin;
+    
+    /* --- UPDATED (Request 2: Better Button Layout) --- */
+    /* This pushes 'Cancel' to the left and 'Continue' to the right */
+    justify-content: space-between; 
+    
+    /* Removed the 'gap' as it's not needed with space-between */
+    
     margin-top: 4vmin;
 }
-
 
 .info{
 	position: absolute;
