@@ -364,21 +364,20 @@ input{
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
-/* --- Lobby Setup Modal (Updated & Fixed) --- */
+/* --- Lobby Setup Modal (Minimal Fix Version) --- */
 #host-settings-modal-container {
-    line-height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: fixed;
+    inset: 0;
     width: 100vw;
     height: 100vh;
-    text-align: center;
-    transition: transform 0.5s;
-    transform: translateY(-200vh);
-    z-index: 200000;
+
     display: flex;
     justify-content: center;
-    align-items: center; /* Center modal vertically */
+    align-items: center;
+
+    transition: transform 0.4s ease;
+    transform: translateY(-200vh);
+    z-index: 200000;
 }
 
 #host-settings-modal-container.active {
@@ -386,47 +385,44 @@ input{
 }
 
 #host-settings-menu {
-    width: clamp(300px, 70vmin, 900px); /* Properly responsive */
+    width: calc(100vw - 40vmin);
     background-color: rgba(0, 0, 0, 0.75);
-    margin: auto; /* Center horizontally */
-    cursor: default;
-    position: relative;
-    padding: clamp(20px, 3vmin, 40px);
+    padding: 5vmin;
+    border: 2px solid white;
     box-sizing: border-box;
 
-    font-size: clamp(14px, 1.8vmin, 20px);
-    line-height: 1.5;
-    display: block;
+    font-size: 2.3vmin;
     color: white;
-    text-align: left;
+}
+
+/* ------------------------------ */
+/* FIX: Prevent global game .button from leaking */
+/* ------------------------------ */
+
+#host-settings-menu .button {
+    all: unset;                /* wipe ALL inherited styles */
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.1);
     border: 2px solid white;
-}
-
-#host-settings-menu h1,
-#host-settings-menu p {
-    text-align: center;
     color: white;
-    font-family: Monoton;
+    font-size: 2vmin;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
 }
 
-#host-settings-menu h1 {
-    font-size: clamp(30px, 5vmin, 60px);
-    margin-bottom: 2vmin;
-    text-shadow: 0 0 1vmin white;
+#host-settings-menu .button:hover {
+    transform: scale(1.08);
+    border-color: #00aaff;
 }
 
-#host-settings-menu p {
-    font-family: Arial, sans-serif;
-    font-size: clamp(14px, 1.8vmin, 20px);
-    margin-bottom: 3vmin;
-}
-
+/* Inputs stay the same */
 .setting-item {
-    margin: 20px 0;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    font-family: Arial, sans-serif;
+    margin: 20px 0;
 }
 
 .setting-item label {
