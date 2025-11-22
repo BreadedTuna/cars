@@ -1,3 +1,6 @@
+// --- DEFAULT GAME SETTINGS ---
+// These are the global variables that the game uses.
+// The host menu will change these before starting a game.
 var SPEED = 0.004;
 var CAMERA_LAG = 0.9;
 var COLLISION = 1.1;
@@ -8,33 +11,45 @@ var BOUNCE_CORRECT = 0.01;
 var WALL_SIZE = 1.2;
 var MOUNTAIN_DIST = 250;
 var OOB_DIST = 200;
-// Global array to store pre-built map data
+var LAPS = 3;
+
+// --- PRESET MAPS ---
+// I've moved the default map from index.html to here
+const DEFAULT_TRACK_CODE = '1,5/0,7 0,7/-1,8 -1,8/-3,9 -3,9/-7,9 -7,9/-9,8 -9,8/-10,7 -10,7/-11,5 -6,7/-4,7 -4,7/-2,6 -2,6/-1,4 -6,7/-8,6 -8,6/-9,4 -1,4/-1,0 1,0/1,5 -11,5/-11,0 -11,0/-10,-1 -10,-1/-8,-1 -8,-1/-7,0 -7,0/-7,2 -9,3/-8,4 -8,4/-6,4 -6,4/-5,3 -5,3/-5,1 -9,1/-9,4 -5,3/-4,4 -4,4/-2,4 -2,4/-1,3 -7,0/-6,-1 -6,-1/-4,-1 -4,-1/-3,0 -3,0/-3,2 -1,0/-1,-2 -1,-2/0,-4 0,-4/2,-5 2,-5/4,-5 4,-5/6,-4 6,-4/7,-2 -3,0/-3,-3 -3,-3/-2,-5 -2,-5/-1,-6 -1,-6/1,-7 1,-7/5,-7 5,-7/7,-6 7,-6/8,-5 8,-5/9,-3 9,-3/9,2 9,2/8,4 8,4/6,5 6,5/4,5 4,5/2,4 2,4/1,2 7,-2/7,2 7,2/6,3 6,3/4,3 4,3/3,2 4,-3/2,-3 2,-3/1,-2 1,-2/1,0 4,-3/5,-2 5,-2/5,1 3,2/3,-1 |-1,3/1,3 6,-4/7,-6 |-7,5 -5,6 -4,5 2,6 1,8 3,9 4,6 3,7 -3,10 -4,12 -10,11 -12,8 -14,8 -12,6 -7,10 -12,2 -15,3 -13,-1 -10,-4 -8,-2 -6,-4 -4,-3 -11,-2 -8,-3 -4,-5 -3,-6 -5,-2 0,-8 -2,-8 -4,-8 -5,-6 -3,-10 2,-9 4,-8 5,-10 6,-8 10,-7 8,-7 9,-11 9,-5 15,-4 11,-2 11,-1 10,3 16,2 12,1 8,6 7,9 6,6 -8,-7 -13,-7 -13,-4 -15,-4 -17,0 |1,3,6/22 0,3,8/55 -2,3,9/77 -8,3,9/115 -10,3,8/148 -11,3,6/166 -8,3,4/-86 -7,3,4/-83 -6,3,4/-90 -10,3,-1/-83 -9,3,-1/-88 -8,3,-1/-90 -6,3,-1/-89 -5,3,-1/-89 -4,3,-1/-89 -4,3,4/-90 -3,3,4/-90 -2,3,4/265 -3,3,-4/194 -2,3,-6/218 0,3,-7/262 6,3,-7/-69 8,3,-6/-42 9,3,-4/-16 9,3,4/40 8,3,5/70 2,3,5/135 3,3,6/122|eval()';
+
 const PRESET_MAPS = [
     {
         id: 'default_track', 
-        name: 'The Starter Loop',
-        description: 'A simple, classic 3-lap oval. Recommended for newcomers.',
-        image_url: 'assets/map_starter_loop.png', // <-- REPLACE WITH YOUR IMAGE PATH
-        map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}]',
+        name: 'Default Track',
+        description: 'The classic figure-8 track.',
+        map_code: DEFAULT_TRACK_CODE,
         default_laps: 3,
         default_speed: 0.004,
-        default_bounce: 0.7
+        default_bounce: 0.7,
+        default_mountain: 250,
+        default_oob: 200
     },
     {
         id: 'city_circuit',
-        name: 'City Circuit Night Run',
-        description: 'A technical circuit with tight turns and high walls. Requires precision and skill.',
-        image_url: 'assets/map_city_circuit.png', // <-- REPLACE WITH YOUR IMAGE PATH
-        map_code: 'walls=[{"x1":-10,"z1":-30,"x2":10,"z2":-30}, {"x1":-10,"z1":-30,"x2":-10,"z2":30}, {"x1":-10,"z1":30,"x2":10,"z2":30}, {"x1":10,"z1":30,"x2":10,"z2":-30}]',
+        name: 'Simple Oval',
+        description: 'A simple, classic oval.',
+        // This is the map code from your original script array
+        map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}] | -1,3/1,3 | | | eval()',
         default_laps: 5,
-        default_speed: 0.003,
-        default_bounce: 0.85
+        default_speed: 0.005,
+        default_bounce: 0.8,
+        default_mountain: 300,
+        default_oob: 250
     }
 ];
 
-// Variable to track the map selected in the modal
-var selectedMap = PRESET_MAPS[0];
-var LAPS = 3;
+// This variable will track the menu's state
+// It can be one of the map objects from PRESET_MAPS, or the string "custom"
+var menuSelectedMap = PRESET_MAPS[0];
+
+// Populate the track code on load
+document.getElementById("trackcode").innerHTML = PRESET_MAPS[0].map_code;
+
 
 // --- Menu music setup ---
 const menuMusic = new Audio("menuloop.wav");
@@ -97,17 +112,6 @@ firebase.auth().signInAnonymously().then(() => {
 	console.error("Anonymous sign-in failed:", error);
 });
 
-/*var config = {
-	apiKey: "AIzaSyDiJsMLlix5o9XqPW1EpeBvuA15XNjlR8M",
-	authDomain: "car-game-a86b9.firebaseapp.com",
-	databaseURL: "https://car-game-a86b9.firebaseio.com",
-	projectId: "car-game-a86b9",
-	storageBucket: "car-game-a86b9.appspot.com",
-	messagingSenderId: "722396856191",
-	appId: "1:722396856191:web:fb5f72917856108a50e44a"
-}*/
-
-
 setTimeout(function(){
 	document.getElementById("title").style.transform = "none";
 }, 500);
@@ -126,106 +130,12 @@ setTimeout(function(){
 setTimeout(function(){
 	document.getElementById("settings").style.transform = "none";
 }, 1800);
-/*var connected = -1;
-/*var config = {
-	apiKey: "AIzaSyDiJsMLlix5o9XqPW1EpeBvuA15XNjlR8M",
-	authDomain: "car-game-a86b9.firebaseapp.com",
-	databaseURL: "https://car-game-a86b9.firebaseio.com",
-	projectId: "car-game-a86b9",
-	storageBucket: "car-game-a86b9.appspot.com",
-	messagingSenderId: "722396856191"
-};
-firebase.initializeApp(config);
-var database = firebase.database();
-try{
-	firebase.analytics();
-}catch(e){ console.log("Analytics were blocked :("); }
-
-
-database.ref("/testServer").once("value", function(e){
-	if(connected < 0 || connected > 0){
-		database = firebase.apps[0].database();
-		connected = 0;
-	}
-});
-
-config = {
-	apiKey: "AIzaSyCsqpn0aTDqU8ffGVE284fmSEOTK2tOgq8",
-	authDomain: "car-game-backup.firebaseapp.com",
-	databaseURL: "https://car-game-backup.firebaseio.com",
-	projectId: "car-game-backup",
-	storageBucket: "car-game-backup.appspot.com",
-	messagingSenderId: "1015722732476"
-};
-firebase.initializeApp(config, "backup");
-database = firebase.apps[1].database();
-database.ref("/testServer").once("value", function(e){
-	if(connected < 0 || connected > 1){
-		database = firebase.apps[1].database();
-		connected = 1;
-	}
-});
-
-config = {
-	apiKey: "AIzaSyDNuMPH_bg8Orkndl8Md6lUh_EOS3pitGs",
-	authDomain: "car-game-backup-2.firebaseapp.com",
-	databaseURL: "https://car-game-backup-2-default-rtdb.firebaseio.com",
-	projectId: "car-game-backup-2",
-	storageBucket: "car-game-backup-2.appspot.com",
-	messagingSenderId: "250860288006",
-	appId: "1:250860288006:web:9df8ed3929e7fceb2d2b87"
-};
-firebase.initializeApp(config, "backup2");
-database = firebase.apps[2].database();
-database.ref("/testServer").once("value", function(e){
-	if(connected < 0 || connected > 2){
-		database = firebase.apps[2].database();
-		connected = 2;
-	}
-});
-
-config = {
-	apiKey: "AIzaSyCmfz7RvzLaAo4xIxA-sH3qhXuGQZYMuvE",
-	authDomain: "car-game-backup-3.firebaseapp.com",
-	databaseURL: "https://car-game-backup-3-default-rtdb.firebaseio.com",
-	projectId: "car-game-backup-3",
-	storageBucket: "car-game-backup-3.appspot.com",
-	messagingSenderId: "477326457153",
-	appId: "1:477326457153:web:421821136bcc6a67f149c0"
-};
-firebase.initializeApp(config, "backup3");
-database = firebase.apps[3].database();
-database.ref("/testServer").once("value", function(e){
-	if(connected < 0 || connected > 3){
-		database = firebase.apps[3].database();
-		connected = 3;
-	}
-});
-
-config = {
-	apiKey: "AIzaSyAerrEq1YUJNZnvQhZvyRa6LOS9VyhEYvs",
-	authDomain: "car-game-backup-4.firebaseapp.com",
-	projectId: "car-game-backup-4",
-	storageBucket: "car-game-backup-4.appspot.com",
-	messagingSenderId: "802151922986",
-	appId: "1:802151922986:web:69b9ff0ad8778d51da7253"
-};
-firebase.initializeApp(config, "backup4");
-database = firebase.apps[4].database();
-database.ref("/testServer").once("value", function(e){
-	if(connected < 0 || connected > 4){
-		database = firebase.apps[4].database();
-		connected = 4;
-	}
-}); */
 
 function forceScroll(){
 	requestAnimationFrame(forceScroll);
 	window.scrollTo(0, 0);
 }
 forceScroll();
-
-//var database = firebase.database();
 
 var camera, renderer, scene, renderer2, scene2, labels = []; 
 scene = new THREE.Scene();
@@ -664,112 +574,205 @@ joinGame = function(){
 var map, trees, signs, startc, main;
 
 function deleteMap(){
-	while(map.children.length > 0)
-		map.remove(map.children[0]);
-	scene.remove(map);
-	while(trees.children.length > 0)
-		trees.remove(trees.children[0]);
-	scene.remove(trees);
-	while(signs.children.length > 0)
-		signs.remove(signs.children[0]);
-	scene.remove(signs);
-	while(startc.children.length > 0)
-		startc.remove(startc.children[0]);
-	scene.remove(startc);
-	while(main.children.length > 0)
-		main.remove(main.children[0]);
-	scene.remove(main);
+    // Check if objects exist before trying to access children
+	if (map && map.children) {
+        while(map.children.length > 0)
+		    map.remove(map.children[0]);
+	    scene.remove(map);
+    }
+	if (trees && trees.children) {
+        while(trees.children.length > 0)
+		    trees.remove(trees.children[0]);
+	    scene.remove(trees);
+    }
+	if (signs && signs.children) {
+        while(signs.children.length > 0)
+		    signs.remove(signs.children[0]);
+	    scene.remove(signs);
+    }
+	if (startc && startc.children) {
+        while(startc.children.length > 0)
+		    startc.remove(startc.children[0]);
+	    scene.remove(startc);
+    }
+	if (main && main.children) {
+        while(main.children.length > 0)
+		    main.remove(main.children[0]);
+	    scene.remove(main);
+    }
 }
 
-function loadMap(){
-	var racedata = document.getElementById("trackcode").innerHTML.trim().split("|")[0].trim().split(" ");
-	var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0xf48342)});
-	//var mapscale = 7;
-	map = new THREE.Object3D();
-	for(var i = 0; i < racedata.length; i++){
-		if(racedata[i] == "")
-			continue;
-		var point1 = new THREE.Vector2(parseInt(racedata[i].split("/")[0].split(",")[0]), parseInt(racedata[i].split("/")[0].split(",")[1]));
-		var point2 = new THREE.Vector2(parseInt(racedata[i].split("/")[1].split(",")[0]), parseInt(racedata[i].split("/")[1].split(",")[1]));
-		var wall = new THREE.Mesh(
-			new THREE.BoxBufferGeometry(point1.distanceTo(point2) * mapscale + 0.3, 1.5, 0.3),
-			material
-		);
-		var angle = Math.atan2((point1.y - point2.y), (point1.x - point2.x));
-		wall.position.set(-(point1.x + point2.x) / 2 * mapscale, 0.75, (point1.y + point2.y) / 2 * mapscale);
-		wall.rotation.set(0, angle, 0, "YXZ");
-		var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle));
-		wall.plane = plane;
-		wall.width = point1.distanceTo(point2) * mapscale;
-		wall.p1 = point1.multiply(new THREE.Vector2(-mapscale, mapscale));
-		wall.p2 = point2.multiply(new THREE.Vector2(-mapscale, mapscale));
-		wall.castShadow = true;
-		wall.receiveShadow = true;
-		map.add(wall);
-	}
-	scene.add(map);
-	
-	trees = new THREE.Object3D();
-	var tree = new THREE.Mesh(
-		new THREE.CylinderBufferGeometry(0, 4, 15),
-		new THREE.MeshLambertMaterial({color: new THREE.Color("#1bad2c")})
-	);
-	var treedata = document.getElementById("trackcode").innerHTML.trim().split("|")[2].trim().split(" ");
-	for(var i = 0; i < treedata.length; i++){
-		if(treedata[i] == "")
-			continue;
-		var t = tree.clone();
-		t.position.set(-parseInt(treedata[i].split(",")[0]) * mapscale, 0, parseInt(treedata[i].split(",")[1]) * mapscale);
-		var s = Math.random() + 1;
-		t.scale.set(s, s, s);
-		t.castShadow = true;
-		t.receiveShadow = true;
-		trees.add(t);
-	}
-	scene.add(trees);
-	
-	signs = new THREE.Object3D();
-	var sign = new THREE.Mesh(
-		new THREE.ConeBufferGeometry(0.7, 2, 5),
-		new THREE.MeshLambertMaterial({color: new THREE.Color("#f00")})
-	);
-	var signdata = document.getElementById("trackcode").innerHTML.trim().split("|")[3].trim().split(" ");
-	for(var i = 0; i < signdata.length; i++){
-		if(signdata[i] == "")
-			continue;
-		var s = sign.clone();
-		var da = signdata[i].split("/");
-		s.position.set(-parseFloat(da[0].split(",")[0]) * mapscale, parseFloat(da[0].split(",")[1]) + 1, parseFloat(da[0].split(",")[2]) * mapscale);
-		s.rotation.set(Math.PI / 2, parseInt(da[1]) / 180 * Math.PI, 0, "YXZ");
-		s.castShadow = true;
-		s.receiveShadow = true;
-		signs.add(s);
-	}
-	scene.add(signs);
-	
-	var startdata = document.getElementById("trackcode").innerHTML.trim().split("|")[1].trim().split(" ");
-	startc = new THREE.Object3D();
-	for(var i = 0; i < startdata.length; i++){
-		if(startdata[i] == "")
-			continue;
-		var point1 = new THREE.Vector2(parseInt(startdata[i].split("/")[0].split(",")[0]), parseInt(startdata[i].split("/")[0].split(",")[1]));
-		var point2 = new THREE.Vector2(parseInt(startdata[i].split("/")[1].split(",")[0]), parseInt(startdata[i].split("/")[1].split(",")[1]));
-		var wall = new THREE.Mesh(
-			new THREE.BoxBufferGeometry(point1.distanceTo(point2) * mapscale, 0.1, 1),
-			new THREE.MeshLambertMaterial({color: new THREE.Color(i == 0 ? "#2580db" : "#db2525")})
-		);
-		var angle = Math.atan2((point1.y - point2.y), (point1.x - point2.x));
-		wall.position.set(-(point1.x + point2.x) / 2 * mapscale, 0, (point1.y + point2.y) / 2 * mapscale);
-		wall.rotation.set(0, angle, 0, "YXZ");
-		var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle));
-		wall.plane = plane;
-		wall.width = point1.distanceTo(point2) * mapscale;
-		wall.castShadow = true;
-		wall.receiveShadow = true;
-		startc.add(wall);
-	}
-	scene.add(startc);
 
+function loadMap(){
+    // First, clean up any old map that might exist
+    deleteMap();
+
+    var trackCodeContent = document.getElementById("trackcode").innerHTML.trim();
+    
+    // Check for JSON-based map code (from your preset)
+    if (trackCodeContent.startsWith("walls=[")) {
+        console.log("Loading JSON-based map");
+        let mapData;
+        try {
+            // Simple parser for this specific format
+            let wallDataString = trackCodeContent.split(" | ")[0];
+            // This is a bit of a hack to make it valid JSON
+            wallDataString = wallDataString.replace('walls=', '{"walls":') + '}';
+            wallDataString = wallDataString.replace(/'/g, '"'); // Replace single quotes
+            
+            mapData = JSON.parse(wallDataString);
+        } catch (e) {
+            console.error("Failed to parse JSON map code:", e, trackCodeContent);
+            return;
+        }
+
+        var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0xf48342)});
+	    map = new THREE.Object3D();
+
+        mapData.walls.forEach(wallDef => {
+            var point1 = new THREE.Vector2(wallDef.x1, wallDef.z1);
+            var point2 = new THREE.Vector2(wallDef.x2, wallDef.z2);
+            
+            var wall = new THREE.Mesh(
+			    new THREE.BoxBufferGeometry(point1.distanceTo(point2) * mapscale + 0.3, 1.5, 0.3),
+			    material
+		    );
+            var angle = Math.atan2((point1.y - point2.y), (point1.x - point2.x));
+		    wall.position.set(-(point1.x + point2.x) / 2 * mapscale, 0.75, (point1.y + point2.y) / 2 * mapscale);
+		    wall.rotation.set(0, angle, 0, "YXZ");
+		    var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+		    wall.plane = plane;
+		    wall.width = point1.distanceTo(point2) * mapscale;
+		    wall.p1 = point1.multiply(new THREE.Vector2(-mapscale, mapscale));
+		    wall.p2 = point2.multiply(new THREE.Vector2(-mapscale, mapscale));
+		    wall.castShadow = true;
+		    wall.receiveShadow = true;
+		    map.add(wall);
+        });
+        scene.add(map);
+
+        // Add placeholder empty objects for the other parts to avoid errors
+        trees = new THREE.Object3D();
+        scene.add(trees);
+        signs = new THREE.Object3D();
+        scene.add(signs);
+        
+        // Add a simple start line for JSON maps
+        startc = new THREE.Object3D();
+        var startLine = new THREE.Mesh(
+			new THREE.BoxBufferGeometry(10 * mapscale, 0.1, 1),
+			new THREE.MeshLambertMaterial({color: new THREE.Color("#2580db")})
+		);
+        startLine.position.set(0, 0, -45 * mapscale); // Position at one end
+        startLine.rotation.set(0, 0, 0, "YXZ");
+        startLine.plane = new THREE.Plane(new THREE.Vector3(0, 0, 1));
+        startLine.width = 10 * mapscale;
+        startc.add(startLine);
+        // Add a checkpoint line
+        var cpLine = new THREE.Mesh(
+			new THREE.BoxBufferGeometry(10 * mapscale, 0.1, 1),
+			new THREE.MeshLambertMaterial({color: new THREE.Color("#db2525")})
+		);
+        cpLine.position.set(0, 0, 45 * mapscale); // Position at other end
+        cpLine.rotation.set(0, 0, 0, "YXZ");
+        cpLine.plane = new THREE.Plane(new THREE.Vector3(0, 0, 1));
+        cpLine.width = 10 * mapscale;
+        startc.add(cpLine);
+
+        scene.add(startc);
+
+    } else {
+        // --- ELSE, LOAD ORIGINAL MAP CODE ---
+        console.log("Loading original | separated map");
+	    var racedata = trackCodeContent.split("|")[0].trim().split(" ");
+	    var material = new THREE.MeshLambertMaterial({color: new THREE.Color(0xf48342)});
+	    map = new THREE.Object3D();
+	    for(var i = 0; i < racedata.length; i++){
+		    if(racedata[i] == "")
+			    continue;
+		    var point1 = new THREE.Vector2(parseInt(racedata[i].split("/")[0].split(",")[0]), parseInt(racedata[i].split("/")[0].split(",")[1]));
+		    var point2 = new THREE.Vector2(parseInt(racedata[i].split("/")[1].split(",")[0]), parseInt(racedata[i].split("/")[1].split(",")[1]));
+		    var wall = new THREE.Mesh(
+			    new THREE.BoxBufferGeometry(point1.distanceTo(point2) * mapscale + 0.3, 1.5, 0.3),
+			    material
+		    );
+		    var angle = Math.atan2((point1.y - point2.y), (point1.x - point2.x));
+		    wall.position.set(-(point1.x + point2.x) / 2 * mapscale, 0.75, (point1.y + point2.y) / 2 * mapscale);
+		    wall.rotation.set(0, angle, 0, "YXZ");
+		    var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+		    wall.plane = plane;
+		    wall.width = point1.distanceTo(point2) * mapscale;
+		    wall.p1 = point1.multiply(new THREE.Vector2(-mapscale, mapscale));
+		    wall.p2 = point2.multiply(new THREE.Vector2(-mapscale, mapscale));
+		    wall.castShadow = true;
+		    wall.receiveShadow = true;
+		    map.add(wall);
+	    }
+	    scene.add(map);
+	
+	    trees = new THREE.Object3D();
+	    var tree = new THREE.Mesh(
+		    new THREE.CylinderBufferGeometry(0, 4, 15),
+		    new THREE.MeshLambertMaterial({color: new THREE.Color("#1bad2c")})
+	    );
+	    var treedata = trackCodeContent.split("|")[2].trim().split(" ");
+	    for(var i = 0; i < treedata.length; i++){
+		    if(treedata[i] == "")
+			    continue;
+		    var t = tree.clone();
+		    t.position.set(-parseInt(treedata[i].split(",")[0]) * mapscale, 0, parseInt(treedata[i].split(",")[1]) * mapscale);
+		    var s = Math.random() + 1;
+		    t.scale.set(s, s, s);
+		    t.castShadow = true;
+		    t.receiveShadow = true;
+		    trees.add(t);
+	    }
+	    scene.add(trees);
+	
+	    signs = new THREE.Object3D();
+	    var sign = new THREE.Mesh(
+		    new THREE.ConeBufferGeometry(0.7, 2, 5),
+		    new THREE.MeshLambertMaterial({color: new THREE.Color("#f00")})
+	    );
+	    var signdata = trackCodeContent.split("|")[3].trim().split(" ");
+	    for(var i = 0; i < signdata.length; i++){
+		    if(signdata[i] == "")
+			    continue;
+		    var s = sign.clone();
+		    var da = signdata[i].split("/");
+		    s.position.set(-parseFloat(da[0].split(",")[0]) * mapscale, parseFloat(da[0].split(",")[1]) + 1, parseFloat(da[0].split(",")[2]) * mapscale);
+		    s.rotation.set(Math.PI / 2, parseInt(da[1]) / 180 * Math.PI, 0, "YXZ");
+		    s.castShadow = true;
+		    s.receiveShadow = true;
+		    signs.add(s);
+	    }
+	    scene.add(signs);
+	
+	    var startdata = trackCodeContent.split("|")[1].trim().split(" ");
+	    startc = new THREE.Object3D();
+	    for(var i = 0; i < startdata.length; i++){
+		    if(startdata[i] == "")
+			    continue;
+		    var point1 = new THREE.Vector2(parseInt(startdata[i].split("/")[0].split(",")[0]), parseInt(startdata[i].split("/")[0].split(",")[1]));
+		    var point2 = new THREE.Vector2(parseInt(startdata[i].split("/")[1].split(",")[0]), parseInt(startdata[i].split("/")[1].split(",")[1]));
+		    var wall = new THREE.Mesh(
+			    new THREE.BoxBufferGeometry(point1.distanceTo(point2) * mapscale, 0.1, 1),
+			    new THREE.MeshLambertMaterial({color: new THREE.Color(i == 0 ? "#2580db" : "#db2525")})
+		    );
+		    var angle = Math.atan2((point1.y - point2.y), (point1.x - point2.x));
+		    wall.position.set(-(point1.x + point2.x) / 2 * mapscale, 0, (point1.y + point2.y) / 2 * mapscale);
+		    wall.rotation.set(0, angle, 0, "YXZ");
+		    var plane = new THREE.Plane(new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), angle));
+		    wall.plane = plane;
+		    wall.width = point1.distanceTo(point2) * mapscale;
+		    wall.castShadow = true;
+		    wall.receiveShadow = true;
+		    startc.add(wall);
+	    }
+	    scene.add(startc);
+    }
+
+    // --- COMMON SCENE OBJECTS (for all map types) ---
 	main = new THREE.Object3D();
 
 	var stripes = new THREE.TextureLoader().load("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQYV2NgYGD4z/D/////AA/6BPwHejn9AAAAAElFTkSuQmCC");
@@ -798,32 +801,36 @@ function loadMap(){
 	}
 	scene.add(main);
 
-	return document.getElementById("trackcode").innerText.trim().split("|")[4];
+    // Parse the settings string *from the loaded map*
+    // This will eval() the code, setting the global vars
+    var settingsString = trackCodeContent.split("|")[4];
+    if (settingsString) {
+        try {
+	        eval(settingsString);
+            console.log("Executed map settings:", settingsString);
+        } catch (e) {
+            console.error("Error executing map settings:", e);
+        }
+    }
 }
 
-function refreshMap(newMapString) {
-    // 1. Delete all map objects in memory
-    if (window.currentMapObjects) {
-        window.currentMapObjects.forEach(obj => {
-            if (obj.destroy) obj.destroy(); // if the game has a destroy method
-            else if (obj.remove) obj.remove(); // fallback
-        });
-    }
 
-    // 2. Clear local map references
-    window.currentMapObjects = [];
-    window.localMapData = null; // clear local copy if it exists
-    window.currentMapString = newMapString; // optional for tracking
+function refreshMap(newMapString) {
+    // 1. Update the trackcode div
+    document.getElementById("trackcode").innerHTML = newMapString;
+    
+    // 2. Delete all map objects in scene
+    deleteMap();
 
     // 3. Load the new map fresh
-    loadMap(newMapString);
+    loadMap();
 
     console.log("Map refreshed and old data cleared.");
 }
 
 
 function join(){
-	eval(loadMap());
+	loadMap(); // Changed: No longer need to eval, loadMap handles it
 	
 	scene.background = new THREE.Color(0x7fb0ff);
 	
@@ -937,24 +944,6 @@ function join(){
 					
 					play.model.children[0].rotation.z = Math.PI / 2 - play.data.steer;
 					play.model.children[1].rotation.z = Math.PI / 2 - play.data.steer;
-					
-					// function checkCubes(angle){
-					// 	ray.set(play.model.position, angle);
-					// 	var inter = ray.intersectObjects(blocks);
-					// 	if(inter.length > 0 && inter[0].distance < 0.5){
-					// 		// console.log(inter[0]);
-					// 		var vel = new THREE.Vector3(play.data.xv, 0, play.data.yv);
-					// 		vel.reflect(inter[0].face.normal);
-					// 		play.data.xv = vel.x * 0.3;
-					// 		play.data.yv = vel.z * 0.3;
-					// 		play.data.x += play.data.xv;
-					// 		play.data.y += play.data.yv;
-					// 	}
-					// }
-					// checkCubes(new THREE.Vector3(0, 0, 1));
-					// checkCubes(new THREE.Vector3(0, 0, -1));
-					// checkCubes(new THREE.Vector3(1, 0, 0));
-					// checkCubes(new THREE.Vector3(-1, 0, 0));
 					
 					for(var w in map.children){
 						var wall = map.children[w];
@@ -1391,9 +1380,9 @@ if (me && me.ref && me.data) {
 					}
 				});
 				database.ref(code + "/map").once("value", function(e){
-					document.getElementById("trackcode").innerHTML = e.val();
-					deleteMap();
-					eval(loadMap());
+					// When joining, the map is set by the host.
+                    // We just need to load it.
+                    refreshMap(e.val());
 				});
 			}else
 				incode.onkeyup = codeCheck;
@@ -1425,63 +1414,115 @@ function openHostMenu() {
     const menu = document.createElement('div');
     menu.className = 'host-settings-menu title'; // Use 'title' class to get Monoton font
 
-    // 3. Create the title
-    const title = document.createElement('h2');
+    // 3. Create the title (smaller)
+    const title = document.createElement('h3');
     title.textContent = 'Host Game Settings';
 
-    // 4. Create the content area (where settings will go)
+    // 4. Create the content area
     const content = document.createElement('div');
     content.className = 'host-settings-content';
-    content.textContent = 'Game settings will go here...';
 
-    // 5. Create the button container
+    // 5. Create Map Selection Area
+    const mapSelection = document.createElement('div');
+    mapSelection.id = 'map-selection-area';
+    
+    PRESET_MAPS.forEach(map => {
+        const mapButton = document.createElement('button');
+        mapButton.className = 'map-preset-button title';
+        mapButton.textContent = map.name;
+        mapButton.title = map.description;
+        mapButton.dataset.mapId = map.id;
+        mapButton.onclick = () => selectMapPreset(map.id);
+        mapSelection.appendChild(mapButton);
+    });
+
+    const customMapButton = document.createElement('button');
+    customMapButton.className = 'map-preset-button title';
+    customMapButton.textContent = 'Custom Map';
+    customMapButton.dataset.mapId = 'custom';
+    customMapButton.onclick = selectCustomMap;
+    mapSelection.appendChild(customMapButton);
+
+    // 6. Create Settings Grid
+    const settingsGrid = document.createElement('div');
+    settingsGrid.id = 'settings-grid';
+
+    // Get default values from the currently selected map or global vars
+    const defaults = (menuSelectedMap && menuSelectedMap !== "custom") ? menuSelectedMap : {
+        default_speed: SPEED,
+        default_bounce: BOUNCE,
+        default_laps: LAPS,
+        default_mountain: MOUNTAIN_DIST,
+        default_oob: OOB_DIST
+    };
+
+    settingsGrid.innerHTML = `
+        <label for="host-speed">Speed:</label>
+        <input type="number" id="host-speed" class="title" value="${defaults.default_speed}" step="0.001" min="0.001">
+        
+        <label for="host-bounce">Bounce:</label>
+        <div class="bounce-slider-container">
+            <input type="range" id="host-bounce" value="${defaults.default_bounce}" min="0" max="1" step="0.1" oninput="document.getElementById('host-bounce-value').textContent = this.value">
+            <span id="host-bounce-value" class="title">${defaults.default_bounce}</span>
+        </div>
+        
+        <label for="host-laps">Laps:</label>
+        <input type="number" id="host-laps" class="title" value="${defaults.default_laps}" step="1" min="1">
+        
+        <label for="host-mountain">Mountain Dist:</label>
+        <input type="number" id="host-mountain" class="title" value="${defaults.default_mountain}" step="25" min="50">
+        
+        <label for="host-oob">OOB Dist:</label>
+        <input type="number" id="host-oob" class="title" value="${defaults.default_oob}" step="25" min="50">
+    `;
+
+    // 7. Create Custom Map Text Area (hidden by default)
+    const customMapText = document.createElement('textarea');
+    customMapText.id = 'custom-map-input';
+    customMapText.className = 'title';
+    customMapText.placeholder = 'Paste your full map code here...';
+    customMapText.oninput = parseCustomMapInput;
+
+    // 8. Create the button container
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'host-menu-buttons';
 
-    // 6. Create the Cancel button
+    // 9. Create the Cancel button
     const cancelButton = document.createElement('button');
     cancelButton.className = 'host-menu-button title cancel'; // Use 'title' class
     cancelButton.textContent = 'Cancel';
+    cancelButton.onclick = closeHostMenu;
 
-    // 7. Create the Continue button
+    // 10. Create the Continue button
     const continueButton = document.createElement('button');
     continueButton.className = 'host-menu-button title continue'; // Use 'title' class
     continueButton.textContent = 'Continue';
+    continueButton.onclick = applyHostSettingsAndHost;
 
-    // 8. Put the buttons in their container
+    // 11. Put the buttons in their container
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(continueButton);
 
-    // 9. Put all elements into the menu
+    // 12. Put all elements into the content area
+    content.appendChild(mapSelection);
+    content.appendChild(settingsGrid);
+    content.appendChild(customMapText);
+    
+    // 13. Put all elements into the menu
     menu.appendChild(title);
     menu.appendChild(content);
     menu.appendChild(buttonContainer);
 
-    // 10. Put the menu into the overlay
+    // 14. Put the menu into the overlay
     overlay.appendChild(menu);
 
-    // 11. Add the overlay to the page
+    // 15. Add the overlay to the page
     document.body.appendChild(overlay);
     
-    // 12. Add event listeners
-    cancelButton.addEventListener('click', closeHostMenu);
+    // 16. Set initial active button
+    updateActiveMapButton();
     
-    // This is where you would transition to the host() function
-    continueButton.addEventListener('click', () => {
-        // For now, it just closes the menu and calls host()
-        // Later, we will read settings here first
-        closeHostMenu();
-        host(); // Call the original host function
-    });
-
-    // Also close if the user clicks the dark overlay area
-    overlay.addEventListener('click', (event) => {
-        if (event.target === overlay) {
-            closeHostMenu();
-        }
-    });
-    
-    // 13. Trigger the "show" animation
+    // 17. Trigger the "show" animation
     setTimeout(() => {
         overlay.classList.add('visible');
     }, 10); // Tiny delay to allow CSS to apply initial state
@@ -1491,18 +1532,146 @@ function openHostMenu() {
 function closeHostMenu() {
     const overlay = document.querySelector('.host-modal-overlay');
     if (overlay) {
-        // Remove the 'visible' class to trigger the fade-out animation
         overlay.classList.remove('visible');
-        
-        // Wait for the animation to finish before removing the element
         overlay.addEventListener('transitionend', () => {
             if (overlay.parentNode) {
                 overlay.parentNode.removeChild(overlay);
             }
-        }, { once: true }); // Ensure the listener only runs once
+        }, { once: true });
     }
 }
 
+// --- HOST MENU HELPER FUNCTIONS ---
+
+function selectMapPreset(mapId) {
+    const map = PRESET_MAPS.find(m => m.id === mapId);
+    if (!map) return;
+    
+    menuSelectedMap = map;
+
+    // Update UI fields
+    document.getElementById('host-speed').value = map.default_speed;
+    document.getElementById('host-bounce').value = map.default_bounce;
+    document.getElementById('host-bounce-value').textContent = map.default_bounce;
+    document.getElementById('host-laps').value = map.default_laps;
+    document.getElementById('host-mountain').value = map.default_mountain;
+    document.getElementById('host-oob').value = map.default_oob;
+    
+    // Hide custom map text
+    document.getElementById('custom-map-input').style.display = 'none';
+
+    updateActiveMapButton();
+}
+
+function selectCustomMap() {
+    menuSelectedMap = "custom";
+    
+    // Show custom map text
+    document.getElementById('custom-map-input').style.display = 'block';
+
+    // Reset fields to global defaults
+    document.getElementById('host-speed').value = SPEED;
+    document.getElementById('host-bounce').value = BOUNCE;
+    document.getElementById('host-bounce-value').textContent = BOUNCE;
+    document.getElementById('host-laps').value = LAPS;
+    document.getElementById('host-mountain').value = MOUNTAIN_DIST;
+    document.getElementById('host-oob').value = OOB_DIST;
+
+    updateActiveMapButton();
+}
+
+function updateActiveMapButton() {
+    const buttons = document.querySelectorAll('.map-preset-button');
+    buttons.forEach(btn => {
+        let btnId = btn.dataset.mapId;
+        if (menuSelectedMap === "custom" && btnId === "custom") {
+            btn.classList.add('active');
+        } else if (typeof menuSelectedMap === 'object' && btnId === menuSelectedMap.id) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+// This function reads the custom map text and updates the UI
+function parseCustomMapInput(event) {
+    const text = event.target.value;
+    const parts = text.split('|');
+    if (parts.length > 4) {
+        // The 5th part (index 4) is the settings string
+        updateMenuFromSettingsString(parts[4]);
+    }
+}
+
+// This parses the settings string (e.g., "SPEED*=2;BOUNCE=0.5;")
+function updateMenuFromSettingsString(settingsString) {
+    if (!settingsString || settingsString.trim() === "eval()") return;
+
+    const settings = settingsString.split(';');
+    settings.forEach(setting => {
+        if (setting.includes('SPEED*=')) {
+            let multiplier = parseFloat(setting.split('=')[1]);
+            if (!isNaN(multiplier)) {
+                // Use the *base* speed (global var) for the multiplier
+                document.getElementById('host-speed').value = (SPEED * multiplier).toFixed(4);
+            }
+        } else if (setting.includes('BOUNCE=')) {
+            let val = parseFloat(setting.split('=')[1]);
+            if (!isNaN(val)) {
+                document.getElementById('host-bounce').value = val;
+                document.getElementById('host-bounce-value').textContent = val;
+            }
+        } else if (setting.includes('LAPS=')) {
+            let val = parseInt(setting.split('=')[1]);
+            if (!isNaN(val)) {
+                document.getElementById('host-laps').value = val;
+            }
+        } else if (setting.includes('MOUNTAIN_DIST=')) {
+            let val = parseInt(setting.split('=')[1]);
+            if (!isNaN(val)) {
+                document.getElementById('host-mountain').value = val;
+            }
+        } else if (setting.includes('OOB_DIST=')) {
+            let val = parseInt(setting.split('=')[1]);
+            if (!isNaN(val)) {
+                document.getElementById('host-oob').value = val;
+            }
+        }
+    });
+}
+
+// This is called by the "Continue" button
+function applyHostSettingsAndHost() {
+    // 1. Apply settings from UI to global variables
+    LAPS = parseInt(document.getElementById('host-laps').value);
+    SPEED = parseFloat(document.getElementById('host-speed').value);
+    BOUNCE = parseFloat(document.getElementById('host-bounce').value);
+    MOUNTAIN_DIST = parseInt(document.getElementById('host-mountain').value);
+    OOB_DIST = parseInt(document.getElementById('host-oob').value);
+
+    // 2. Set the map code in #trackcode
+    if (menuSelectedMap === "custom") {
+        let fullMapCode = document.getElementById('custom-map-input').value;
+        if (fullMapCode.trim() === "") {
+            alert("Custom map code cannot be empty!");
+            return;
+        }
+        
+        // We set the *full* code, including the settings string,
+        // so that loadMap() can parse it.
+        document.getElementById('trackcode').innerHTML = fullMapCode;
+
+    } else if (menuSelectedMap) {
+        // It's a preset map object
+        document.getElementById('trackcode').innerHTML = menuSelectedMap.map_code;
+    }
+    // If menuSelectedMap is somehow null, it'll just use the last loaded map
+
+    // 3. Close menu and call host()
+    closeHostMenu();
+    host(); // Call the original host function
+}
 
 // --- END OF NEW HOST SETTINGS MENU ---
 
@@ -1532,5 +1701,7 @@ if(mobile){
 
 document.body.onkeydown = function(e){
 	if(e.keyCode == 73 && (e.ctrlKey || e.metaKey))
-		document.getElementById("trackcode").innerText = prompt("Track data?")
+		// document.getElementById("trackcode").innerText = prompt("Track data?")
+        // Deprecated: Use the host menu to change track data
+        console.log("Track data can now be changed in the Host Settings menu.");
 }
