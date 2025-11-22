@@ -70,7 +70,19 @@ const PRESET_MAPS = [
         default_bounce: 1,
         default_mountain: 325,
         default_oob: 300
-    }
+    },
+	{
+        id: 'tree',
+        name: 'Tree',
+        description: 'tree',
+        image_url: 'tree.png',
+        map_code: '||0,0 ||SPEED*=0.000000001;BOUNCE=0;MOUNTAIN_DIST=350;OOB_DIST=300;LAPS=1;',
+		default_laps: 1,
+        default_speed: 0.00000000004,
+        default_bounce: 0,
+        default_mountain: 350,
+        default_oob: 300
+	}
 ];
 
 // This variable will track the menu's state
