@@ -1735,9 +1735,73 @@ window.onkeyup = function(e){
         right = false;
 }
 
-if(mobile){
-   
+if(tablet){
+    // --- 1. Helper function to create the UI buttons ---
+    function createButton(side) {
+        const btn = document.createElement('div');
+        
+        // Style the button (Visuals)
+        btn.style.position = 'fixed'; // Keeps it on screen even if page scrolls
+        btn.style.bottom = '50px';    // Distance from bottom
+        btn.style.width = '100px';
+        btn.style.height = '100px';
+        btn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent
+        btn.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+        btn.style.borderRadius = '50%'; // Make it circular
+        btn.style.zIndex = '1000';      // Ensure it sits on top of the game
+        btn.style.userSelect = 'none';  // Prevent highlighting text on touch
+        
+        // Positioning (Left or Right)
+        if(side === 'left') {
+            btn.style.left = '20px';
+            btn.innerHTML = '<span style="font-size:40px; color:white; line-height:95px;">&#9664;</span>'; // Left Arrow
+        } else {
+            btn.style.right = '20px';
+            btn.innerHTML = '<span style="font-size:40px; color:white; line-height:95px;">&#9654;</span>'; // Right Arrow
+        }
+        
+        // Center the arrow icon
+        btn.style.textAlign = 'center';
+
+        document.body.appendChild(btn);
+        return btn;
+    }
+
+    const leftBtn = createButton('left');
+    const rightBtn = createButton('right');
+
+    // --- 2. Touch Event Logic ---
+    
+    // Function to handle 'KeyDown' equivalent for touch
+    function handleTouchStart(e, isLeft) {
+        e.preventDefault(); // Important: Prevents browser scrolling or zooming
+        if(isLeft) left = true;
+        else right = true;
+        
+        // Visual feedback (make button brighter when pressed)
+        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+    }
+
+    // Function to handle 'KeyUp' equivalent for touch
+    function handleTouchEnd(e, isLeft) {
+        e.preventDefault();
+        if(isLeft) left = false;
+        else right = false;
+        
+        // Revert visual feedback
+        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    }
+
+    // --- 3. Bind the events ---
+    
+    // Note: { passive: false } is required to allow e.preventDefault() to work
+    leftBtn.addEventListener('touchstart', (e) => handleTouchStart(e, true), { passive: false });
+    leftBtn.addEventListener('touchend', (e) => handleTouchEnd(e, true), { passive: false });
+
+    rightBtn.addEventListener('touchstart', (e) => handleTouchStart(e, false), { passive: false });
+    rightBtn.addEventListener('touchend', (e) => handleTouchEnd(e, false), { passive: false });
 }
+
 
 document.body.onkeydown = function(e){
 	if(e.keyCode == 73 && (e.ctrlKey || e.metaKey))
