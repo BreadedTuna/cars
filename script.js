@@ -1721,8 +1721,6 @@ function refreshgame() {
 }
 
 // wasd/arrow controls
-let left = false;
-let right = false;
 window.onkeydown = function(e){
     if(e.keyCode == 37 || e.keyCode == 65) 
         left = true;
@@ -1737,8 +1735,8 @@ window.onkeyup = function(e){
         right = false;
 }
 
-if(mobile) {
-	
+if(mobile){
+   
 }
 
 document.body.onkeydown = function(e){
