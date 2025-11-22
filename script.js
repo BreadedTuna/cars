@@ -52,7 +52,7 @@ const PRESET_MAPS = [
         name: 'Default Track',
         description: 'The classic figure-8 track.',
         // Using a placeholder image. Replace with your 'assets/map_starter_loop.png'
-        image_url: 'https://placehold.co/200x150/000000/FFFFFF?text=Default+Map',
+        image_url: 'track1.png',
         map_code: DEFAULT_TRACK_CODE,
         default_laps: 3,
         default_speed: 0.004,
