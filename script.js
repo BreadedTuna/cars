@@ -1735,73 +1735,65 @@ window.onkeyup = function(e){
         right = false;
 }
 
+
 if(mobile){
-    // --- 1. Helper function to create the UI buttons ---
-    function createButton(side) {
-        const btn = document.createElement('div');
-        
-        // Style the button (Visuals)
-        btn.style.position = 'fixed'; // Keeps it on screen even if page scrolls
-        btn.style.bottom = '50px';    // Distance from bottom
-        btn.style.width = '100px';
+    // --- 1. Setup the Button Elements ---
+    var leftBtn = document.createElement('div');
+    var rightBtn = document.createElement('div');
+
+    // Helper to style the buttons shared properties
+    function styleBtn(btn) {
+        btn.style.position = 'fixed';
+        btn.style.bottom = '20px';     // Distance from bottom
+        btn.style.width = '100px';     // Size of touch area
         btn.style.height = '100px';
-        btn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // Semi-transparent
+        btn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // See-through
         btn.style.border = '2px solid rgba(255, 255, 255, 0.5)';
-        btn.style.borderRadius = '50%'; // Make it circular
-        btn.style.zIndex = '1000';      // Ensure it sits on top of the game
-        btn.style.userSelect = 'none';  // Prevent highlighting text on touch
-        
-        // Positioning (Left or Right)
-        if(side === 'left') {
-            btn.style.left = '20px';
-            btn.innerHTML = '<span style="font-size:40px; color:white; line-height:95px;">&#9664;</span>'; // Left Arrow
-        } else {
-            btn.style.right = '20px';
-            btn.innerHTML = '<span style="font-size:40px; color:white; line-height:95px;">&#9654;</span>'; // Right Arrow
-        }
-        
-        // Center the arrow icon
-        btn.style.textAlign = 'center';
-
+        btn.style.borderRadius = '50%';
+        btn.style.zIndex = '9999';     // Ensure they are on top of game canvas
+        btn.style.userSelect = 'none'; // Prevent text highlighting
         document.body.appendChild(btn);
-        return btn;
     }
 
-    const leftBtn = createButton('left');
-    const rightBtn = createButton('right');
+    styleBtn(leftBtn);
+    styleBtn(rightBtn);
 
-    // --- 2. Touch Event Logic ---
+    // Set specific positions (Left vs Right)
+    leftBtn.style.left = '20px';
+    // Optional: Add an arrow character for visual clarity
+    leftBtn.innerHTML = '<div style="text-align:center; line-height:100px; color:white; font-size:40px;">&larr;</div>';
     
-    // Function to handle 'KeyDown' equivalent for touch
-    function handleTouchStart(e, isLeft) {
-        e.preventDefault(); // Important: Prevents browser scrolling or zooming
-        if(isLeft) left = true;
-        else right = true;
-        
-        // Visual feedback (make button brighter when pressed)
-        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
-    }
+    rightBtn.style.right = '20px';
+    rightBtn.innerHTML = '<div style="text-align:center; line-height:100px; color:white; font-size:40px;">&rarr;</div>';
 
-    // Function to handle 'KeyUp' equivalent for touch
-    function handleTouchEnd(e, isLeft) {
+    // --- 2. Logic Mapping (The "Work" Part) ---
+
+    // LEFT BUTTON EVENTS
+    leftBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault(); // Prevents browser zooming/scrolling
+        left = true;        // Equivalent to keydown 37
+        leftBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.5)'; // Visual feedback
+    }, {passive: false});
+
+    leftBtn.addEventListener('touchend', function(e) {
         e.preventDefault();
-        if(isLeft) left = false;
-        else right = false;
-        
-        // Revert visual feedback
-        e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-    }
+        left = false;       // Equivalent to keyup 37
+        leftBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    }, {passive: false});
 
-    // --- 3. Bind the events ---
-    
-    // Note: { passive: false } is required to allow e.preventDefault() to work
-    leftBtn.addEventListener('touchstart', (e) => handleTouchStart(e, true), { passive: false });
-    leftBtn.addEventListener('touchend', (e) => handleTouchEnd(e, true), { passive: false });
+    // RIGHT BUTTON EVENTS
+    rightBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        right = true;       // Equivalent to keydown 39
+        rightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.5)';
+    }, {passive: false});
 
-    rightBtn.addEventListener('touchstart', (e) => handleTouchStart(e, false), { passive: false });
-    rightBtn.addEventListener('touchend', (e) => handleTouchEnd(e, false), { passive: false });
+    rightBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        right = false;      // Equivalent to keyup 39
+        rightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+    }, {passive: false});
 }
-
 
 document.body.onkeydown = function(e){
 	if(e.keyCode == 73 && (e.ctrlKey || e.metaKey))
