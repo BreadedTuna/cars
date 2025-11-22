@@ -126,7 +126,7 @@ input{
 	border: 1vmin solid white;
 	border-radius: 4.5vmin;
 	-webkit-transform: translate(-4.5vmin, -2vmin);
-	        transform: translate(-4.s.css.vmin, -2vmin);
+	        transform: translate(-4.5vmin, -2vmin);
 	cursor: pointer;
 	box-shadow: 0 0 1vmin black;
 	transition: -webkit-transform .2s;
@@ -394,6 +394,10 @@ input{
 	text-align: center;
 	transform: scale(0.9);
 	transition: transform 0.3s ease;
+	/* Added max-height and overflow for safety on small screens */
+	max-height: 95vh;
+	display: flex;
+	flex-direction: column;
 }
 
 .host-modal-overlay.visible {
@@ -412,12 +416,15 @@ input{
 	margin-bottom: 2vmin;
 	text-shadow: 0 0 1vmin black;
 	color: white;
+	flex-shrink: 0; /* Prevent title from shrinking */
 }
 
 .host-settings-content {
 	display: flex;
 	flex-direction: column;
 	gap: 2vmin;
+	overflow-y: auto; /* Allow content to scroll if needed */
+	padding-right: 1vmin; /* Add padding for scrollbar */
 }
 
 /* Map Selection Buttons */
@@ -427,19 +434,34 @@ input{
 	gap: 1.5vmin;
 	flex-wrap: wrap;
 	margin-bottom: 1vmin;
+	flex-shrink: 0;
 }
 
 .map-preset-button {
 	font-family: 'Monoton', cursive;
-	font-size: 3vmin;
+	font-size: 2.5vmin; /* Smaller font for map name */
 	background-color: rgba(0, 0, 0, 0.5);
 	border: 0.5vmin solid white;
 	color: white;
-	padding: 1vmin 2vmin;
+	padding: 1vmin;
 	cursor: pointer;
 	text-shadow: none;
 	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 	transition: transform .2s, box-shadow .2s, border-color .2s;
+	
+	/* New styles for image layout */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 25vmin; /* Give buttons a consistent width */
+}
+
+.map-preset-button img {
+	width: 100%;
+	height: 12vmin; /* Fixed height for image */
+	object-fit: cover;
+	border: 0.2vmin solid white;
+	margin-bottom: 1vmin;
 }
 
 .map-preset-button:hover {
@@ -454,7 +476,7 @@ input{
 	transform: scale(0.95);
 }
 
-/* Settings Grid Layout */
+/* Settings Grid Layout - RESTORED to clean 2-column */
 #settings-grid {
 	display: grid;
 	grid-template-columns: auto 1fr;
@@ -471,7 +493,6 @@ input{
 
 /* Shared style for inputs */
 .host-settings-menu input[type="number"],
-.host-settings-menu input[type="range"],
 .host-settings-menu textarea {
 	background-color: rgba(0, 0, 0, 0.5);
 	border: 0.5vmin solid white;
@@ -481,10 +502,16 @@ input{
 	padding: 1vmin;
 	box-sizing: border-box;
 	text-align: left;
+	outline: none;
+}
+.host-settings-menu input[type="number"]:focus,
+.host-settings-menu textarea:focus {
+	border-color: #4dff4d;
 }
 
+
 .host-settings-menu input[type="number"] {
-	width: 15vmin;
+	width: 20vmin; /* Increased width a bit */
 }
 
 /* Container for the bounce slider + value */
@@ -493,17 +520,55 @@ input{
 	align-items: center;
 	gap: 1.5vmin;
 }
-.bounce-slider-container input[type="range"] {
-	flex: 1;
-	padding: 0;
-	height: 2.5vmin;
-}
+
 .bounce-slider-container span {
 	font-family: 'Press Start 2P', cursive;
 	font-size: 2.2vmin;
-	width: 5vmin;
+	width: 6vmin; /* More space for "0.x" */
 	text-align: left;
 }
+
+/* --- NEW SLIDER STYLES --- */
+input[type="range"] {
+	-webkit-appearance: none;
+	appearance: none;
+	flex: 1;
+	height: 2.5vmin;
+	background: rgba(0, 0, 0, 0.5);
+	border: 0.5vmin solid white;
+	cursor: pointer;
+	padding: 0;
+}
+/* Slider Handle: Webkit */
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 3.5vmin; /* Circle size */
+	height: 3.5vmin;
+	background: white;
+	border: 0.5vmin solid #555;
+	border-radius: 50%;
+	box-shadow: 0 0 1vmin black;
+	transition: transform .2s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+	transform: scale(1.2);
+}
+/* Slider Handle: Firefox */
+input[type="range"]::-moz-range-thumb {
+	width: 3.5vmin;
+	height: 3.5vmin;
+	background: white;
+	border: 0.5vmin solid #555;
+	border-radius: 50%;
+	box-shadow: 0 0 1vmin black;
+	transition: transform .2s;
+	cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb:hover {
+	transform: scale(1.2);
+}
+
 
 /* Custom Map Text Area */
 #custom-map-input {
@@ -514,6 +579,9 @@ input{
 	font-size: 1.5vmin; /* Smaller to fit more text */
 	font-family: monospace;
 	line-height: 1.4;
+	/* Make it span both columns */
+	grid-column: 1 / -1;
+	text-align: left;
 }
 
 /* Bottom Buttons */
@@ -522,6 +590,7 @@ input{
 	justify-content: space-between;
 	gap: 2vmin;
 	margin-top: 1.5vmin;
+	flex-shrink: 0; /* Prevent buttons from shrinking */
 }
 
 .host-menu-button {
