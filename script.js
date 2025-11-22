@@ -75,7 +75,7 @@ const PRESET_MAPS = [
         id: 'tree',
         name: 'Tree',
         description: 'tree',
-        image_url: 'tree.png',
+        image_url: 'treewide.png',
         map_code: '||0,0 ||SPEED*=0.000000001;BOUNCE=0;MOUNTAIN_DIST=350;OOB_DIST=300;LAPS=1;',
 		default_laps: 1,
         default_speed: 0.00000000004,
