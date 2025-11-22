@@ -1735,7 +1735,7 @@ window.onkeyup = function(e){
         right = false;
 }
 
-if(tablet){
+if(mobile){
     // --- 1. Helper function to create the UI buttons ---
     function createButton(side) {
         const btn = document.createElement('div');
