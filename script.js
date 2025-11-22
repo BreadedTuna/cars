@@ -1750,7 +1750,7 @@ if(mobile){
         btn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'; // See-through
         btn.style.border = '2px solid rgba(255, 255, 255, 0.5)';
         btn.style.borderRadius = '50%';
-        btn.style.zIndex = '9999';     // Ensure they are on top of game canvas
+        btn.style.zIndex = '2147483647';    // Ensure they are on top of game canvas
         btn.style.userSelect = 'none'; // Prevent text highlighting
         document.body.appendChild(btn);
     }
