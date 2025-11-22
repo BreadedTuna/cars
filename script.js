@@ -1737,7 +1737,7 @@ window.onkeyup = function(e){
         right = false;
 }
 
-if(tablet) {
+if(mobile) {
 	
 }
 
