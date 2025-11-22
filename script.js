@@ -145,8 +145,9 @@ scene = new THREE.Scene();
 renderer = new THREE.WebGLRenderer();
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-var mobile = navigator.userAgent.match("Mobile")!=null||navigator.userAgent.match("Linux;")!=null;
-if(!mobile){
+var mobile = /Mobi|Android/i.test(navigator.userAgent);
+var tablet = /iPad|Tablet|Nexus 7|Nexus 10|SM-T/i.test(navigator.userAgent);
+if(mobile || tablet){
 	renderer.shadowMap.enabled = false;
 	renderer.shadowMap.autoUpdate = false;
 	renderer.shadowMap.needsUpdate = true;
