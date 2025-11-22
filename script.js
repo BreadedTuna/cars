@@ -1721,6 +1721,8 @@ function refreshgame() {
 }
 
 // wasd/arrow controls
+let left = false;
+let right = false;
 window.onkeydown = function(e){
     if(e.keyCode == 37 || e.keyCode == 65) 
         left = true;
@@ -1735,8 +1737,100 @@ window.onkeyup = function(e){
         right = false;
 }
 
-if(mobile){
-   
+// Assume 'tablet' is a boolean variable determined elsewhere (e.g., screen size check)
+if(tablet){ 
+    
+    // --- 1. CREATE BUTTON ELEMENTS ---
+    
+    // Create container for controls
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'touch-controls';
+    
+    // Create Left Button
+    const leftButton = document.createElement('button');
+    leftButton.id = 'turn-left';
+    leftButton.textContent = '◂';
+    
+    // Create Right Button
+    const rightButton = document.createElement('button');
+    rightButton.id = 'turn-right';
+    rightButton.textContent = '▸';
+
+    // Append buttons to the container
+    controlsContainer.appendChild(leftButton);
+    controlsContainer.appendChild(rightButton);
+
+    // Append the container to the document body
+    document.body.appendChild(controlsContainer);
+
+
+    // --- 2. APPLY INLINE STYLING FOR POSITIONING AND LOOK ---
+    
+    // Container Styling (Positions controls at the bottom of the screen)
+    controlsContainer.style.position = 'fixed';
+    controlsContainer.style.bottom = '10px';
+    controlsContainer.style.width = '100%';
+    controlsContainer.style.display = 'flex';
+    controlsContainer.style.justifyContent = 'space-between';
+    controlsContainer.style.padding = '0 20px'; // Add padding on sides
+    controlsContainer.style.boxSizing = 'border-box';
+    controlsContainer.style.zIndex = '1000'; // Ensure it's on top of everything
+
+    // Button Base Styling (Apply to both buttons using a function)
+    const styleButton = (button) => {
+        button.style.width = '80px';
+        button.style.height = '80px';
+        button.style.fontSize = '40px';
+        button.style.fontWeight = 'bold';
+        button.style.color = 'white';
+        button.style.border = '2px solid white';
+        button.style.borderRadius = '50%';
+        button.style.background = 'rgba(0, 0, 0, 0.4)'; // Semi-transparent black
+        button.style.cursor = 'pointer';
+        button.style.userSelect = 'none'; // Prevent text selection
+        // Optional: Add a simple effect for when the button is pressed
+        button.addEventListener('touchstart', () => button.style.background = 'rgba(255, 255, 255, 0.2)');
+        button.addEventListener('touchend', () => button.style.background = 'rgba(0, 0, 0, 0.4)');
+    };
+    
+    styleButton(leftButton);
+    styleButton(rightButton);
+
+
+    // --- 3. ATTACH TOUCH LOGIC ---
+
+    // LEFT BUTTON LOGIC
+    leftButton.addEventListener('touchstart', function(e) {
+        e.preventDefault(); 
+        left = true;
+    }, false); 
+
+    leftButton.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        left = false;
+    }, false);
+    
+    // Fallback/Testing: Mouse logic
+    leftButton.addEventListener('mousedown', () => left = true);
+    leftButton.addEventListener('mouseup', () => left = false);
+    leftButton.addEventListener('mouseleave', () => left = false);
+
+
+    // RIGHT BUTTON LOGIC
+    rightButton.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        right = true;
+    }, false);
+
+    rightButton.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        right = false;
+    }, false);
+    
+    // Fallback/Testing: Mouse logic
+    rightButton.addEventListener('mousedown', () => right = true);
+    rightButton.addEventListener('mouseup', () => right = false);
+    rightButton.addEventListener('mouseleave', () => right = false);
 }
 
 document.body.onkeydown = function(e){
