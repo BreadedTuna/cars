@@ -330,7 +330,7 @@ menu2 = function() {
 	f.style.transform = "translate3d(0, -100vh, 0)";
 	setTimeout(function() {
 		f.innerHTML = `
-			<div class='menuitem title button' id='hostsettings' ontouchstart='this.click()' onclick='hostsettings()'>Host settings</div>
+			<div class='menuitem title button' id='hostsettings' ontouchstart='this.click()' onclick='openHostMenu()'>Host settings</div>
 			<div class='menuitem title button' id='host' ontouchstart='this.click()' onclick='host()'>Host a game</div>
 			<div class='menuitem title button' id='join' ontouchstart='this.click()' onclick='joinGame()'>Join a game</div>
 		`;
@@ -1411,95 +1411,101 @@ function startGame(){
 
 function startMenu() {
 	alert("in development 🤫🤫🤫")
+}
+
+// --- NEW HOST SETTINGS MENU ---
+
+// Function to open the new host settings menu
+function openHostMenu() {
+    // 1. Create the overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'host-modal-overlay';
+    
+    // 2. Create the menu
+    const menu = document.createElement('div');
+    menu.className = 'host-settings-menu title'; // Use 'title' class to get Monoton font
+
+    // 3. Create the title
+    const title = document.createElement('h2');
+    title.textContent = 'Host Game Settings';
+
+    // 4. Create the content area (where settings will go)
+    const content = document.createElement('div');
+    content.className = 'host-settings-content';
+    content.textContent = 'Game settings will go here...';
+
+    // 5. Create the button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'host-menu-buttons';
+
+    // 6. Create the Cancel button
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'host-menu-button title cancel'; // Use 'title' class
+    cancelButton.textContent = 'Cancel';
+
+    // 7. Create the Continue button
+    const continueButton = document.createElement('button');
+    continueButton.className = 'host-menu-button title continue'; // Use 'title' class
+    continueButton.textContent = 'Continue';
+
+    // 8. Put the buttons in their container
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(continueButton);
+
+    // 9. Put all elements into the menu
+    menu.appendChild(title);
+    menu.appendChild(content);
+    menu.appendChild(buttonContainer);
+
+    // 10. Put the menu into the overlay
+    overlay.appendChild(menu);
+
+    // 11. Add the overlay to the page
+    document.body.appendChild(overlay);
+    
+    // 12. Add event listeners
+    cancelButton.addEventListener('click', closeHostMenu);
+    
+    // This is where you would transition to the host() function
+    continueButton.addEventListener('click', () => {
+        // For now, it just closes the menu and calls host()
+        // Later, we will read settings here first
+        closeHostMenu();
+        host(); // Call the original host function
+    });
+
+    // Also close if the user clicks the dark overlay area
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+            closeHostMenu();
+        }
+    });
+    
+    // 13. Trigger the "show" animation
+    setTimeout(() => {
+        overlay.classList.add('visible');
+    }, 10); // Tiny delay to allow CSS to apply initial state
+}
+
+// Function to close the new host settings menu
+function closeHostMenu() {
+    const overlay = document.querySelector('.host-modal-overlay');
+    if (overlay) {
+        // Remove the 'visible' class to trigger the fade-out animation
+        overlay.classList.remove('visible');
+        
+        // Wait for the animation to finish before removing the element
+        overlay.addEventListener('transitionend', () => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+        }, { once: true }); // Ensure the listener only runs once
     }
-
-	// Function to start the Custom Host flow (called by the "Custom Host" menu button)
-// --- Modal Visibility Handlers ---
-
-// Function to start the Custom Host flow (called by the "Custom Host" menu button)
-// Function to start the Custom Host flow (called by the "Custom Host" menu button)
-function hostsettings() {
-    createSettingsModal();
-    // Show the modal by setting the active class on the container
-    document.getElementById("host-settings-modal-container").classList.add("active");
 }
 
-// Helper to close the modal
-function closeSettingsModal() {
-    // Hide the modal by removing the active class
-    document.getElementById("host-settings-modal-container").classList.remove("active");
-}
 
-// Function to create the modal HTML structure
-function createSettingsModal() {
-    // If the modal container exists, just return.
-    if (document.getElementById("host-settings-modal-container")) {
-        return;
-    }
-    
-    // Create the container element (for the slide-in animation)
-    var container = document.createElement("DIV");
-    container.id = "host-settings-modal-container";
+// --- END OF NEW HOST SETTINGS MENU ---
 
-    // Create the menu element (the actual content panel)
-    var menu = document.createElement("DIV");
-    menu.id = "host-settings-menu";
-    
-    // This HTML is a direct copy of your track editor's settings menu,
-    // adapted to use your main game's function names and variables.
-    menu.innerHTML = `
-        <h1>Game Settings</h1>
-        <p>Set the game properties for your track.</p>
-        
-        <div class="setting-item">
-            <label for="setting-speed">SPEED MULTIPLIER</label>
-            <input type="number" id="setting-speed" value="${SPEED}" step="0.001" min="0.001" max="0.01">
-        </div>
-        
-        <div class="setting-item">
-            <label for="setting-bounce">BOUNCE (<span id="bounce-value">${BOUNCE}</span>)</label>
-            <input type="range" id="setting-bounce" min="0" max="1" value="${BOUNCE}" step="0.05" oninput="document.getElementById('bounce-value').innerText = this.value">
-        </div>
-        
-        <div class="setting-item">
-            <label for="setting-mountain">MOUNTAIN_DIST</label>
-            <input type="number" id="setting-mountain" value="325" step="5">
-        </div>
-        
-        <div class="setting-item">
-            <label for="setting-oob">OOB_DIST</label>
-            <input type="number" id="setting-oob" value="300" step="5">
-        </div>
-        
-        <div class="setting-item">
-            <label for="setting-laps">LAPS</label>
-            <input type="number" id="setting-laps" value="${LAPS}" step="1" min="1">
-        </div>
-        
-        <div class="button-row">
-            <div class="button" onclick="closeSettingsModal()">Cancel</div>
-            <div class="button" onclick="applySettings()">Continue to Host</div>
-        </div>
-    `;
-    
-    container.appendChild(menu);
-    document.body.appendChild(container);
-}
-
-// This function is called by the "Continue to Host" button
-function applySettings() {
-    alert("Apply settings logic needs to be implemented to host the game.");
-    // This is where you will read inputs, check for custom map code, and call hostGame(...)
-    
-    // Example of how to read the new values:
-    // const newLaps = document.getElementById("setting-laps").value;
-    // const newSpeed = document.getElementById("setting-speed").value;
-    // const newBounce = document.getElementById("setting-bounce").value;
-    // console.log("New settings:", newLaps, newSpeed, newBounce);
-}
-
-// Note: You still need to implement the 'applySettings' and 'quickHostGame' 
-// functions to complete the flow, using the logic discussed previously.
 
 function refreshgame() {
     window.location.reload(); 
