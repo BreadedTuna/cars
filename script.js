@@ -1707,19 +1707,21 @@ function refreshgame() {
     window.location.reload(); 
 }
 
-
+// wasd/arrow controls
 window.onkeydown = function(e){
-	if(e.keyCode == 37)
-		left = true;
-	if(e.keyCode == 39)
-		right = true;
+    if(e.keyCode == 37 || e.keyCode == 65) 
+        left = true;
+    if(e.keyCode == 39 || e.keyCode == 68) 
+        right = true;
 }
 
 window.onkeyup = function(e){
-	if(e.keyCode == 37)
-		left = false;
-	if(e.keyCode == 39)
-		right = false;
+    if(e.keyCode == 37 || e.keyCode == 65)
+        left = false;
+    if(e.keyCode == 39 || e.keyCode == 68) 
+        right = false;
+}
+	right = false;
 }
 
 if(mobile){
