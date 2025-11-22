@@ -40,7 +40,7 @@ input{
 	transition: -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out;
 	transition: transform .5s ease-out, -webkit-transform .5s ease-out;
-/* 	animation: slidetop 0.5s ease-out forwards; */
+/* animation: slidetop 0.5s ease-out forwards; */
 }
 /* @keyframes slidetop{
 	0%{transform: translate3d(0, -100vh, 0)}
@@ -66,7 +66,7 @@ input{
 	transition: -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out;
 	transition: transform .5s ease-out, -webkit-transform .5s ease-out;
-/* 	animation: slideleft 1s -0.5s ease-out forwards; */
+/* animation: slideleft 1s -0.5s ease-out forwards; */
 }
 
 /* Styling for the Main Menu Button after a win */
@@ -262,7 +262,7 @@ input{
 	display: none;
 }
 #start{
-/* 	animation: slideleft 1s -0.25s forwards; */
+/* animation: slideleft 1s -0.25s forwards; */
 	font-size: 10vmin;
 	background-color: rgba(0, 0, 0, 0.5);
 	display: inline-block;
@@ -308,8 +308,8 @@ input{
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
-/* 	-webkit-transform-style: preserve-3d; */
-/* 	animation: slideleft 1s -0.5s ease-out forwards; */
+/* -webkit-transform-style: preserve-3d; */
+/* animation: slideleft 1s -0.5s ease-out forwards; */
 }
 #join{
 	top: calc(70vh - 8vmin);
@@ -318,8 +318,8 @@ input{
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
-/* 	-webkit-transform-style: preserve-3d; */
-/* 	animation: slideleft 1s ease-out forwards; */
+/* -webkit-transform-style: preserve-3d; */
+/* animation: slideleft 1s ease-out forwards; */
 }
 
 #hostsettings {
@@ -336,7 +336,7 @@ input{
 	
 	/* Entry animation */
 	-webkit-transform: translate3d(-100vw, 0, 0);
-	        transform: translate3d(-100vw, 0, 0);
+	    	transform: translate3d(-100vw, 0, 0);
 	transition: box-shadow .2s, -webkit-transform .5s ease-out;
 	transition: transform .5s ease-out, box-shadow .2s;
 	transition: transform .5s ease-out, box-shadow .2s, -webkit-transform .5s ease-out;
@@ -363,137 +363,118 @@ input{
 	        transform: scale(0.9) !important;
 }
 
-/* --- Lobby Setup Modal --- */
-#host-settings-modal-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
 
-    display: flex;
-    justify-content: center;   /* CENTER HORIZONTALLY */
-    align-items: center;       /* CENTER VERTICALLY */
+/* --- NEW HOST SETTINGS MENU STYLES --- */
 
-    transition: transform 0.5s;
-    transform: translateY(-200vh);
-    z-index: 200000;
+/* This overlay dims the background */
+.host-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(5px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 100000;
+	/* Start hidden */
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-#host-settings-modal-container.active {
-    transform: translateY(0);
+/* The menu container */
+.host-settings-menu {
+	background: rgba(0, 0, 0, 0.85);
+	border: 1vmin solid white;
+	box-shadow: 0 2vmin 3vmin rgba(0, 0, 0, 0.5);
+	padding: 3vmin;
+	width: 90vw;
+	max-width: 800px;
+	color: white;
+	text-align: center;
+	/* Animation */
+	transform: scale(0.9);
+	transition: transform 0.3s ease;
 }
 
-/* CENTERED MENU */
-#host-settings-menu {
-    /* --- UPDATED (Request 1: Bigger Menu) --- */
-    width: 85vw;       /* Was 75vw */
-    max-width: 1500px; /* Was 1300px */
-
-    background-color: rgba(0, 0, 0, 0.85);
-
-    padding: 4vmin;
-    box-sizing: border-box;
-
-    border: 2px solid white;
-    color: white;
-
-    font-family: Arial, sans-serif;
-    text-align: left;
-
-    display: block;
+/* Show animation when 'visible' class is added */
+.host-modal-overlay.visible {
+	opacity: 1;
+	visibility: visible;
 }
 
-/* HEADERS */
-#host-settings-menu h1,
-#host-settings-menu p {
-    color: white;
-    text-align: center;
-    font-family: Arial, sans-serif;
+.host-modal-overlay.visible .host-settings-menu {
+	transform: scale(1);
 }
 
-#host-settings-menu h1 {
-    font-size: 4.5vmin;
-    margin-bottom: 1.5vmin;
-    /* This keeps the title less glowy from our last fix */
-    text-shadow: 0 0 0.4vmin rgba(255, 255, 255, 0.8);
+.host-settings-menu h2 {
+	font-size: 8vmin;
+	margin-top: 0;
+	margin-bottom: 3vmin;
+	text-shadow: 0 0 1vmin black;
+	color: white;
 }
 
-#host-settings-menu p {
-    font-size: 2.2vmin;
-    margin-bottom: 3vmin;
+/* This is where your settings (track selection, laps, etc.) will go */
+.host-settings-content {
+	min-height: 30vmin; /* Placeholder height */
+	margin-bottom: 3vmin;
+	border: 1vmin dashed rgba(255, 255, 255, 0.3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 2vmin;
+	font-size: 3vmin;
+	color: #aaa;
 }
 
-/* SETTINGS */
-.setting-item {
-    margin: 15px 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+/* Container for the bottom buttons */
+.host-menu-buttons {
+	display: flex;
+	justify-content: space-between;
+	gap: 2vmin;
 }
 
-.setting-item label {
-    font-size: 2.2vmin;
-    font-weight: bold;
+/* Styling for the menu buttons, matching your #start button */
+.host-menu-button {
+	flex: 1; /* Make buttons share space */
+	font-size: 5vmin;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 1vmin solid white;
+	padding: 2vmin;
+	cursor: pointer;
+	transition: box-shadow .2s, -webkit-transform .2s;
+	transition: transform .2s, box-shadow .2s;
+	transition: transform .2s, box-shadow .2s, -webkit-transform .2s;
+	text-shadow: none;
+	box-shadow: 0 1vmin 2vmin rgba(0, 0, 0, 0.5);
+	color: white;
 }
 
-#host-settings-menu input[type="number"] {
-    background-color: #333;
-    color: white;
-    border: 1px solid #888;
-    padding: 0.7vmin 1vmin;
-    font-size: 2.2vmin;
-    width: 120px;
-    border-radius: 5px;
+.host-menu-button:hover {
+	-webkit-transform: scale(0.9);
+	        transform: scale(0.9);
+	box-shadow: 0 0.5vmin 1vmin rgba(0, 0, 0, 0.5);
 }
 
-#host-settings-menu input[type="range"] {
-    width: 200px;
-    cursor: pointer;
+/* Specific colors for continue/cancel */
+.host-menu-button.continue {
+	/* A subtle green to indicate "go" */
+	border-color: #4dff4d;
+	text-shadow: 0 0 1vmin #4dff4d;
 }
 
-/* BUTTON STYLES (Unchanged) */
-/* This block styles the individual buttons */
-#host-settings-menu .button,
-#host-settings-menu .menu-button,
-#host-settings-menu button {
-    all: unset !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 12vmin;
-    height: 4vmin;
-    font-family: inherit;
-    font-size: 1.8vmin;
-    font-weight: 600;
-    color: #fff;
-    background: rgba(255,255,255,0.08);
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: 0.6vmin;
-    cursor: pointer;
-    transition: 0.12s ease;
-    box-sizing: border-box;
-    transform: none !important;
+.host-menu-button.cancel {
+	/* A subtle red to indicate "stop" */
+	border-color: #ff4d4d;
+	text-shadow: 0 0 1vmin #ff4d4d;
 }
 
-/* Hover effect like the game UI (Unchanged) */
-#host-settings-menu .button:hover {
-    border-color: #00aaff;
-    background: rgba(255,255,255,0.14);
-}
+/* --- END OF NEW STYLES --- */
 
-/* BUTTON LAYOUT (This is the container) */
-#host-settings-menu .button-row {
-    display: flex;
-    
-    /* --- UPDATED (Request 2: Better Button Layout) --- */
-    /* This pushes 'Cancel' to the left and 'Continue' to the right */
-    justify-content: space-between; 
-    
-    /* Removed the 'gap' as it's not needed with space-between */
-    
-    margin-top: 4vmin;
-}
 
 .info{
 	position: absolute;
