@@ -1728,7 +1728,5 @@ if(mobile){
 
 document.body.onkeydown = function(e){
 	if(e.keyCode == 73 && (e.ctrlKey || e.metaKey))
-		// document.getElementById("trackcode").innerText = prompt("Track data?")
-        // Deprecated: Use the host menu to change track data
-        console.log("Track data can now be changed in the Host Settings menu.");
+		document.getElementById("trackcode").innerText = prompt("You can also input track data in the host settings menu, this feature will soon be deprecated")
 }
