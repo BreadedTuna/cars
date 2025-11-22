@@ -52,6 +52,9 @@ var menuSelectedMap = PRESET_MAPS[0];
 // Populate the track code on load
 document.getElementById("trackcode").innerHTML = PRESET_MAPS[0].map_code;
 
+const menuMusic = new Audio("menuloop.wav");
+menuMusic.loop = true;
+menuMusic.volume = 0; // start silent
 
 // --- Menu music setup ---
 // ... existing code ...
