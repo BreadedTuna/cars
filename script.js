@@ -1722,11 +1722,9 @@ window.onkeyup = function(e){
     if(e.keyCode == 39 || e.keyCode == 68) 
         right = false;
 }
-	right = false;
-}
 
 if(mobile){
-	
+   
 }
 
 document.body.onkeydown = function(e){
