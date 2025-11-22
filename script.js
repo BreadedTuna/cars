@@ -51,7 +51,6 @@ const PRESET_MAPS = [
         id: 'default_track', 
         name: 'Default Track',
         description: 'The classic figure-8 track.',
-        // Using a placeholder image. Replace with your 'assets/map_starter_loop.png'
         image_url: 'track1.png',
         map_code: DEFAULT_TRACK_CODE,
         default_laps: 3,
@@ -61,17 +60,16 @@ const PRESET_MAPS = [
         default_oob: 200
     },
     {
-        id: 'city_circuit',
-        name: 'Simple Oval',
-        description: 'A simple, classic oval.',
-         // Using a placeholder image. Replace with your 'assets/map_city_circuit.png'
+        id: 'nascar_track',
+        name: 'Nascar Track',
+        description: 'Increased speed, nascar race track',
         image_url: 'https://placehold.co/200x150/000000/FFFFFF?text=Simple+Oval',
         map_code: 'walls=[{"x1":-20,"z1":-50,"x2":20,"z2":-50}, {"x1":-20,"z1":-50,"x2":-20,"z2":50}, {"x1":-20,"z1":50,"x2":20,"z2":50}, {"x1":20,"z1":50,"x2":20,"z2":-50}] | -1,3/1,3 | | | eval()',
-        default_laps: 5,
-        default_speed: 0.005,
-        default_bounce: 0.8,
-        default_mountain: 300,
-        default_oob: 250
+        default_laps: 10,
+        default_speed: 0.012,
+        default_bounce: 1,
+        default_mountain: 325,
+        default_oob: 300
     }
 ];
 
