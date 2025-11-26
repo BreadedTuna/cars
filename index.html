@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- thanks to https://realfavicongenerator.net/ -->
+	<link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="194x194" href="favicons/favicon-194x194.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="favicons/android-chrome-192x192.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png">
+	<link rel="manifest" href="favicons/manifest.json">
+	<link rel="mask-icon" href="favicons/safari-pinned-tab.svg" color="#5bbad5">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1">
+	<meta name="referrer" content="no-referrer-when-downgrade">
+	<link href="https://fonts.googleapis.com/css?family=Monoton|Press+Start+2P" rel="stylesheet">
+	<link href="style.css" rel="stylesheet">
+
+	<!-- Game libraries -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/86/three.min.js"></script>
+	<script src="https://jchabin.github.io/VR-ThreeJS-Test/ThreeJS/DeviceOrientationControls.js"></script>
+	<script src="https://jchabin.github.io/VR-ThreeJS-Test/ThreeJS/StereoEffect.js"></script>
+
+	<!-- Firebase (v7.22.1) -->
+	<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-database.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-analytics.js"></script>
+
+	<!-- Google ads -->
+	<script data-ad-client="ca-pub-8222390470642566" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+	<title>Online Racing Game!</title>
+</head>
+	<body>
+	<!-- 
+		The map code has been moved to script.js in the PRESET_MAPS array.
+		This div is now populated by the script on load.
+	-->
+	<div id="trackcode" class="data"></div>
+	
+	<div id="fore">
+		<div id="version">v1.1.5.1</div>
+		<div class="title" id="title">Online racing game!</div>
+		<div class="menuitem title">Pick a name:<br/><input id="name" class="title" ontouchstart="this.focus()" placeholder="Name"></input></div>
+    <script>
+    window.location.href = "https://rmcars.vercel.app";
+  </script>
+		<script>
+			var color, updateColor, menu2, host, joinGame, codeCheck;
+		</script>
+		<div class="menuitem title">Choose a color:<br/><div id="colorpicker" ontouchstart="event.touches[0].buttons = 1; this.onmousemove(event.touches[0])" ontouchmove="event.touches[0].buttons = 1; this.onmousemove(event.touches[0])" onmousedown="this.onmousemove(event)" onmousemove="if(event.buttons == 1){ var x = event.clientX - this.getBoundingClientRect().left; x = Math.min(this.clientWidth, Math.max(0, x)); color = Math.floor(x / this.clientWidth * 360); updateColor(); }"><div id="slider"></div></div></div>
+		<div class="menuitem title"><div id="start" onclick="menu2()">Start!</div></div>
+		<div id="settings" onclick="this.parentNode.children[7].className = this.parentNode.children[7].className == 'sel' ? '' : 'sel';"></div>
+		<div id="toolbar">
+			<div class="tools" id="edit"
+     onclick="
+       if (location.hostname.includes('vercel.app')) {
+         window.open('https://rmcarseditor.vercel.app', '_blank');
+       } else {
+         if (location.href.includes('index.html')) {
+           window.open('https://rmcarseditor.vercel.app', '_blank');
+         } else {
+           window.open('https://rmcarseditor.vercel.app', '_blank');
+         }
+       }
+     ">
+</div>
+			<div class="tools" id="cardboard" onclick="this.className = this.className == 'tools disabled' ? this.className : this.className == 'tools sel' ? 'tools' : 'tools sel';"></div>
+			<div class="tools" id="help" onclick="location.href.includes('index.html') ? window.open('help/index.html') : window.open('help')">?</div>
+		</div>
+		<a id="mywebsitelink" href="https://johnnychabin.com/?projects" target="_blank"><img src="https://johnnychabin.com/images/carsprev.webp" style="max-height: 30vmin;"></a>
+	</div>
+	<script src="script.js"></script>
+		<script src="googleauth.js"></script>
+		<script src="adminui.js"></script>
+	</body>
+</html>
